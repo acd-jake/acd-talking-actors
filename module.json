@@ -36,7 +36,7 @@
     }
   ],
   "url": "https://github.com/acd-jake/acd-talking-actors",
-  "download": "https://github.com/acd-jake/acd-talking-actors/archive/0.3.0.zip",
+  "download": " https://github.com/acd-jake/acd-talking-actors/releases/latest/download/acd-talking-actors-0.3.0.zip",
   "manifest": "https://github.com/acd-jake/acd-talking-actors/releases/latest/download/module.json",
   "bugs": "https://github.com/acd-jake/acd-talking-actors/issues",
   "allowBugReporter": true
