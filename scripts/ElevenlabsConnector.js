@@ -19,7 +19,7 @@ export class ElevenlabsConnector {
 
     processChatMessage(chatlog, messageText, chatData) {
         const talkCommand = "talk";
-        let messageData = messageText.match(`^/(${talkCommand}) (.*)$`);
+        let messageData = messageText.match(`^/(${talkCommand}) ((.|[\r\n])*)$`);
 
         if (!messageData || messageData[1] != talkCommand) {
             // no chat command or wrong chat command found. Return for further processing
@@ -38,7 +38,7 @@ export class ElevenlabsConnector {
 
         // do we have a voicename specified (e.g. "/talk [Dave] ...")? 
         // This will override the voice configured for the talking actor
-        if (messageData = messageText.match("^\\[([a-zA-z0-9]+)\\] (.*)$")) {
+        if (messageData = messageText.match("^\\[([a-zA-z0-9]+)\\] ((.|[\r\n])*)$")) {
             let voiceName = messageData[1];
             messageText = messageData[2];
 
