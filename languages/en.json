@@ -1,0 +1,41 @@
+{
+    "acd.ta": {
+        "settings": {
+            "ApiKey": "API-Key",
+            "ApiKeyHint":"Your Elevenlabs API Key"
+        },
+        "controls": {
+            "button.title": "Voice Settings"
+        },
+        "VoiceSettings": {
+            "Title" : "Voice Settings for Actors",
+            "Actors" : "Actors",
+            "AddActor" : "Add an actor",
+            "Add" : "Add",
+            "ClearAll" : "Clear all actors",
+            "Clear" : "Clear",
+            "DeleteActor": "Remove this actor",
+            "VoiceLabel": "Voice",
+            "AcceptData" : "Accept",
+            "Close" : "Close",
+            "PlaySample" : "Play Sample",
+            "VoiceSelection" : "Voice Selection",
+            "Settings" : "Voice Settings",
+            "SimilarityBoost" : "Similarity Boost",
+            "Stability" : "Stability",
+            "Style" : "Style"
+        },
+        "errors":
+        {
+            "noTokenSelected" : "At least one token has to be selected.",
+            "noLinkedActor" : "At least one token with a linked actor has to be selected!",
+            "notAllLinkedActors": "Not all selected token are linked to actors. Voice settings will only assigned to the linked actors.",
+            "noApiKey" : "The Elevenlabs api key has to be configured in the settings first.",
+            "unknownVoice" : "No Elevenlabs voice found.",
+            "tokensAlreadyAdded" : "Some actors are already contained and not added again."
+        },
+        "chat": {
+            "textTalked": "Talked Text:"
+        }
+    }
+}

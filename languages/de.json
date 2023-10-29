@@ -1,0 +1,41 @@
+{
+    "acd.ta": {
+        "settings": {
+            "ApiKey": "API-Key",
+            "ApiKeyHint":"Dein API Key von Elevenlabs"
+        },
+        "controls": {
+            "button.title": "Stimmeinstellungen"
+        },
+        "VoiceSettings": {
+            "Title" : "Stimmeinstellungen für den Akteur",
+            "Actors" : "Akteure",
+            "AddActor" : "Akteur hinzufügen",
+            "Add" : "Hinzufügen",
+            "ClearAll" : "Alle Akteure entfernen",
+            "Clear" : "Alles entfernen",
+            "DeleteActor": "Diesen Akteur entfernen",
+            "VoiceLabel": "Stimme",
+            "AcceptData" : "Annehmen",
+            "Close" : "Schliessen",
+            "PlaySample" : "Beispiel abspielen",
+            "VoiceSelection" : "Stimmauswahl",
+            "Settings" : "Einstellungen für die Stimme",
+            "SimilarityBoost" : "Similarity Boost",
+            "Stability" : "Stability",
+            "Style" : "Style"
+        },
+        "errors":
+        {
+            "noTokenSelected" : "Mindestens ein Token muss ausgewählt sein.",
+            "noLinkedActor" : "Mindestens ein Token mit einem verbundenen Akteur muss ausgewählt sein.",
+            "notAllLinkedActors": "Nicht alle ausgewählten Token sind mit Akteuren verbunden. Die Stimmeinstellungen werden nur für die verbundenen Akteure übernommen.",
+            "noApiKey" : "Der Api-Schlüssel von Elevenlabs muss zuerst in den Einstellungen konfiguriert werden.",
+            "unknownVoice" : "Keine Stimme von Elevenlabs gefunden.",
+            "tokensAlreadyAdded" : "Einige Akteure sind bereits enthalten und werden nicht neu hinzugefügt."
+        },
+        "chat": {
+            "textTalked": "Gesprochener Text:"
+        }
+    }
+}

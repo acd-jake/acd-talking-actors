@@ -1,0 +1,43 @@
+{
+  "id": "acd-talking-actors",
+  "title": "Talking Actors",
+  "version": "0.3.0",
+  "compatibility": {
+    "minimum": "11",
+    "verified": "11"
+  },
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "languages/en.json"
+  },
+  {
+    "lang": "de",
+    "name": "Deutsch",
+    "path": "languages/de.json"
+}
+],
+  "styles": [
+    "styles/ta-styles.css"
+  ],
+  "esmodules": [
+    "scripts/init.js"
+  ],
+  "socket": true,
+  "description": "Selectable and adjustable voices for FoundryVTT actors through Elevenlabs integration.\\nSimply configure the voice for an actor and use the /talk chat command in the chat to hear him talk.\\nAn Elevenlabs subscription is required for the API Key.",
+  "authors": [
+    {
+      "name": "Acd-Jake",
+      "discord": "Acd-Jake",
+      "flags": {
+        "github": "acd-jake"
+      }
+    }
+  ],
+  "url": "https://github.com/acd-jake/acd-talking-actors",
+  "download": "https://github.com/acd-jake/acd-talking-actors/archive/0.3.0.zip",
+  "manifest": "https://github.com/acd-jake/acd-talking-actors/releases/latest/download/module.json",
+  "bugs": "https://github.com/acd-jake/acd-talking-actors/issues",
+  "allowBugReporter": true
+}
