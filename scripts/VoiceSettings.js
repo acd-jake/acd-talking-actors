@@ -48,11 +48,17 @@ export class VoiceSettingsApp extends Application {
 
     getData(options) {
         let dispOptions = this.requestoptions = this.baseoptions;
+        let currentSettings = this.getCurrentVoiceSettings();
+        
         return {
             actors: this.actors,
             voices: this.voices,
             voiceId: this.getCurrentVoiceId(),
-            voiceSettings: this.getCurrentVoiceSettings()
+            voiceSettings: currentSettings,
+            currentStability: currentSettings.stability ? Math.round(currentSettings.stability*100) : 0,
+            currentSimilarityBoost: currentSettings.similarity_boost ? Math.round(currentSettings.similarity_boost*100) : 0,
+            currentStyle: currentSettings.style ? Math.round(currentSettings.style*100) : 0,
+
         };
     }
 
@@ -77,7 +83,6 @@ export class VoiceSettingsApp extends Application {
 
         $('#similarity_boost', html).change($.proxy(async function (e) {
             that.voiceSettings.similarity_boost = $(e.currentTarget).val();
-            $('.ta-voice-settings #similarity_boost_label').text(this.voiceSettings.similarity_boost + " %");
             that.setTextValue($('.ta-voice-settings #similarity_boost_label'), this.voiceSettings.similarity_boost);
         }, this));
 

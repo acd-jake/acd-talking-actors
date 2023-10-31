@@ -35,7 +35,6 @@ export class ElevenlabsConnector {
 
         let voice_id;
         let settings;
-
         // do we have a voicename specified (e.g. "/talk [Dave] ...")? 
         // This will override the voice configured for the talking actor
         if (messageData = messageText.match("^\\[([a-zA-z0-9]+)\\] ((.|[\r\n])*)$")) {
@@ -54,11 +53,11 @@ export class ElevenlabsConnector {
         console.log(voice_id)
 
         if (voice_id) {
-            this.textToSpeech(voice_id, messageText);
+            this.textToSpeech(voice_id, messageText, settings);
             this.postToChat(chatData, localize("acd.ta.chat.textTalked"), `<span class="acd-ta-talked">${messageText}</span>`);
         } else {
             ui.notifications.error(localize("acd.ta.errors.unknownVoice"));
-            this.postToChat(chatData, ``, messageText);
+            this.postToChat(chatData,``, messageText);
         }
         return false;
     }
@@ -88,8 +87,8 @@ export class ElevenlabsConnector {
         return new GetVoiceSettingsRequest(voiceId).fetch();
     }
 
-    async textToSpeech(voiceId, text) {
-        let container = await new TextToSpeechRequest(voiceId, text).fetch();
+    async textToSpeech(voiceId, text, settings) {
+        let container = await new TextToSpeechRequest(voiceId, text, settings).fetch();
 
         let chunks = await this.readChunks(container);
         game.socket.emit('module.' + MODULE.ID, { testarg: "Hello World", container: chunks })
