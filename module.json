@@ -1,7 +1,7 @@
 {
   "id": "acd-talking-actors",
   "title": "Talking Actors",
-  "version": "0.3.2",
+  "version": "#{VERSION}#",
   "compatibility": {
     "minimum": "11",
     "verified": "11"
@@ -10,12 +10,12 @@
     {
       "lang": "en",
       "name": "English",
-      "path": "languages/en.json"
+      "path": "language/en.json"
   },
   {
     "lang": "de",
     "name": "Deutsch",
-    "path": "languages/de.json"
+    "path": "language/de.json"
 }
 ],
   "styles": [
@@ -35,9 +35,9 @@
       }
     }
   ],
-  "url": "https://github.com/acd-jake/acd-talking-actors",
-  "download": " https://github.com/acd-jake/acd-talking-actors/releases/latest/download/acd-talking-actors-0.3.2.zip",
-  "manifest": "https://github.com/acd-jake/acd-talking-actors/releases/latest/download/module.json",
+  "url": "#{URL}#",
+  "download": "#{DOWNLOAD}#",
+  "manifest": "#{MANIFEST}#",
   "bugs": "https://github.com/acd-jake/acd-talking-actors/issues",
   "allowBugReporter": true
 }
