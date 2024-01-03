@@ -5,4 +5,5 @@ Using the chat command /talk with an actor selected will let the character speak
 
 An Elevenlabs subscription is required for the module to work. https://beta.elevenlabs.io/
 
-This module is a spritual successor to the module "Elevenlabs for Foundry" by Vexthecollector (https://github.com/Vexthecollector/elevenlabs-for-foundry/tree/main).
+* This module is a spritual successor to the module "Elevenlabs for Foundry" by Vexthecollector (https://github.com/Vexthecollector/elevenlabs-for-foundry/tree/main).
+* This module optionally uses the [Yendors Scene Actors](https://foundryvtt.com/packages/yendors-scene-actors) module if this is activated. If an actor is set to focus in the Scene Actors module, it is used for the voice output and does not need to have a token in the active scene. (Added in version 0.4)
