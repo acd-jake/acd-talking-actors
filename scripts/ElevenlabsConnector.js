@@ -45,7 +45,9 @@ export class ElevenlabsConnector {
             voice_id = this.allVoices.filter(obj => { return obj.name === voiceName })[0]?.voice_id;
         }
         // otherwise check the optional module Yendor's Scene Actors
-        else if (game.modules.get("yendors-scene-actors") && game.yendorsSceneActors.actorFocusId != null) {
+        else if (game.modules.get("yendors-scene-actors") 
+            && game.modules.get("yendors-scene-actors").active
+            && game.yendorsSceneActors.actorFocusId != null) {
             speakerActor = game.yendorsSceneActors.actorsDetail.find((t) => t._id == game.yendorsSceneActors.actorFocusId)
         }
         // otherwise get the standard speaking actor
