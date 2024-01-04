@@ -55,7 +55,7 @@ export class ElevenlabsConnector {
 
         // check if a voice is configured for the talking character
         if (speakerActor) {
-            const moduleFlags = speakerActor.flags[MODULE.ID];
+            const moduleFlags = game.actors.get(speakerActor).flags[MODULE.ID];
             voice_id = moduleFlags ? moduleFlags[FLAGS.VOICE_ID] : undefined;
             settings = moduleFlags ? moduleFlags[FLAGS.VOICE_SETTINGS] : undefined;
 
