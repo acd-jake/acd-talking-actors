@@ -14,7 +14,7 @@ export class ElevenlabsConnector {
     }
 
     HasApiKey() {
-        return game.settings.get(MODULE.ID, MODULE.APIKEY) !== undefined;
+        return game.settings.get(MODULE.ID, MODULE.APIKEY) != undefined;
     }
 
     processChatMessage(chatlog, messageText, chatData) {
