@@ -28,7 +28,7 @@ Hooks.on("getSceneControlButtons", (controls, b, c) => {
     controls
         .find((x) => x.name == "token")
         .tools.push({
-            icon: "game-icon game-icon-talk",
+            icon: "fa-solid fa-comments",
             name: "elfa-button",
             title: localize("acd.ta.controls.button.title"),
             onClick: function (toggle) {
