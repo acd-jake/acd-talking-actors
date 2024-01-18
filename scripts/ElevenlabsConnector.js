@@ -48,10 +48,15 @@ export class ElevenlabsConnector {
         // otherwise check the optional module Yendor's Scene Actors
         else if (game.modules.get("yendors-scene-actors") 
             && game.modules.get("yendors-scene-actors").active
+            && game.yendorsSceneActors.show
             && game.yendorsSceneActors.actorFocusId != null) {
             speakerActor = game.yendorsSceneActors.actorsDetail.find((t) => t._id == game.yendorsSceneActors.actorFocusId)
             chatData.speaker.actor = game.yendorsSceneActors.actorFocusId;
-            chatData.speaker.alias = speakerActor.name;
+            if ( speakerActor.flags["yendors-scene-actors"]?.isNameRevealed )  {
+                chatData.speaker.alias = speakerActor.name;
+            } else {
+                chatData.speaker.alias = localize("acd.ta.chat.unknownSpeaker");
+            }
         }
         // otherwise get the standard speaking actor
         else if (chatData && chatData.speaker && chatData.speaker.actor) {

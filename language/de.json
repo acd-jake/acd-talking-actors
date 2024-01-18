@@ -35,7 +35,8 @@
             "tokensAlreadyAdded" : "Einige Akteure sind bereits enthalten und werden nicht neu hinzugefügt."
         },
         "chat": {
-            "textTalked": "Gesprochener Text:"
+            "textTalked": "Gesprochener Text:",
+            "unknownSpeaker": "Unbekannter Sprecher"
         }
     }
 }
