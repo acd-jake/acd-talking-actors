@@ -58,13 +58,28 @@ export class ElevenlabsConnector {
             speakerActor = game.actors.get(chatData.speaker.actor);
         }
 
-        // check if a voice is configured for the talking character
-        if (speakerActor) {
-            const moduleFlags = speakerActor.flags[MODULE.ID];
-            voice_id = moduleFlags ? moduleFlags[FLAGS.VOICE_ID] : undefined;
-            settings = moduleFlags ? moduleFlags[FLAGS.VOICE_SETTINGS] : undefined;
-
+        // if no actor has been found yet, check if a narrating actor has been specified in the settings
+        if (!speakerActor) {
+            const narratingActorId = game.settings.get(MODULE.ID,MODULE.NARRATORACTOR);
+            if (narratingActorId)
+            {
+                speakerActor = game.actors.find((a) => a._id == narratingActorId);
+                chatData.speaker.actor = narratingActorId;
+            }
         }
+
+        // check if a voice is configured for the talking character
+        ({ voice_id, settings } = this.getVoiceIdAndSettingsFromActor(speakerActor));
+
+        // if no voice seeting have been found, try to use the settings for the narrating actor
+        if (!voice_id) {
+            const narratingActorId = game.settings.get(MODULE.ID,MODULE.NARRATORACTOR);
+            if (narratingActorId) {
+                speakerActor = game.actors.find((a) => a._id == narratingActorId);
+                ({ voice_id, settings } = this.getVoiceIdAndSettingsFromActor(speakerActor));
+            }
+        }
+
         console.log(voice_id)
 
         if (voice_id) {
@@ -75,6 +90,18 @@ export class ElevenlabsConnector {
             this.postToChat(chatData,``, messageText);
         }
         return false;
+    }
+
+    getVoiceIdAndSettingsFromActor(speakerActor) {
+        let voice_id;
+        let settings;
+
+        if (speakerActor) {
+            const moduleFlags = speakerActor.flags[MODULE.ID];
+            voice_id = moduleFlags ? moduleFlags[FLAGS.VOICE_ID] : undefined;
+            settings = moduleFlags ? moduleFlags[FLAGS.VOICE_SETTINGS] : undefined;
+        }
+        return { voice_id, settings };
     }
 
     postToChat(chatData, flavor, messageText) {
