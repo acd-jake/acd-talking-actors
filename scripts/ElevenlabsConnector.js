@@ -36,6 +36,7 @@ export class ElevenlabsConnector {
         let voice_id;
         let settings;
         let speakerActor;
+        
         // do we have a voicename specified (e.g. "/talk [Dave] ...")? 
         // This will override the voice configured for the talking actor
         if (messageData = messageText.match("^\\[([a-zA-z0-9]+)\\] ((.|[\r\n])*)$")) {
@@ -49,15 +50,17 @@ export class ElevenlabsConnector {
             && game.modules.get("yendors-scene-actors").active
             && game.yendorsSceneActors.actorFocusId != null) {
             speakerActor = game.yendorsSceneActors.actorsDetail.find((t) => t._id == game.yendorsSceneActors.actorFocusId)
+            chatData.speaker.actor = game.yendorsSceneActors.actorFocusId;
+            chatData.speaker.alias = speakerActor.name;
         }
         // otherwise get the standard speaking actor
         else if (chatData && chatData.speaker && chatData.speaker.actor) {
-            speakerActor = chatData.speaker.actor;
+            speakerActor = game.actors.get(chatData.speaker.actor);
         }
 
         // check if a voice is configured for the talking character
         if (speakerActor) {
-            const moduleFlags = game.actors.get(speakerActor).flags[MODULE.ID];
+            const moduleFlags = speakerActor.flags[MODULE.ID];
             voice_id = moduleFlags ? moduleFlags[FLAGS.VOICE_ID] : undefined;
             settings = moduleFlags ? moduleFlags[FLAGS.VOICE_SETTINGS] : undefined;
 
