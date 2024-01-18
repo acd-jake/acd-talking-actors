@@ -6,6 +6,9 @@ class ElevenlabsRequest {
 
     constructor() {
         this.api_key = game.settings.get(MODULE.ID, MODULE.APIKEY);
+        if (this.api_key?.length <1) {
+            this.api_key = game.settings.get(MODULE.ID, MODULE.MASTERAPIKEY);
+        }
     }
 
     execute() {
