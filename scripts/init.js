@@ -8,6 +8,16 @@ export let localize = key => {
 
 Hooks.once("init", async function () {
 
+    game.settings.register(MODULE.ID, MODULE.MASTERAPIKEY, {
+        name: localize("acd.ta.settings.MasterApiKey"),
+        hint: localize("acd.ta.settings.MasterApiKeyHint"),
+        scope: "world",
+        config: true,
+        type: String,
+        onChange: value => { game.talkingactors.connector.initializeMain() },
+        requiresReload: true 
+    });
+
     game.settings.register(MODULE.ID, MODULE.APIKEY, {
         name: localize("acd.ta.settings.ApiKey"),
         hint: localize("acd.ta.settings.ApiKeyHint"),
