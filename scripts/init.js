@@ -27,6 +27,16 @@ Hooks.once("init", async function () {
         onChange: value => { game.talkingactors.connector.initializeMain() }
     });
 
+    game.settings.register(MODULE.ID, MODULE.NARRATORACTOR, {
+        name: localize("acd.ta.settings.NarratorActor"),
+        hint: localize("acd.ta.settings.NarratorActorHint"),
+        scope: "client",
+        config: true,
+        type: String,
+        onChange: value => { game.talkingactors.connector.initializeMain() }
+    });
+
+
     game.talkingactors = {
         connector: new ElevenlabsConnector()
     };

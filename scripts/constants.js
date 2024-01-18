@@ -7,7 +7,8 @@ export const MODULE = {
     DIR: 'modules/acd-talking-actors/',
     TEMPLATEDIR: 'modules/acd-talking-actors/templates/',
     APIKEY: "xi-api-key",
-    MASTERAPIKEY: "xi-master-api-key"
+    MASTERAPIKEY: "xi-master-api-key",
+    NARRATORACTOR: "narrating-actor"
 }
 
 export const FLAGS = {

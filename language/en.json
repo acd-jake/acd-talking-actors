@@ -4,7 +4,9 @@
             "ApiKey": "API-Key",
             "ApiKeyHint":"Your Elevenlabs API Key",
             "MasterApiKey": "Master-API-Key",
-            "MasterApiKeyHint":"The Elevenlabs API Key to be used by all clients without their own API-Key. Leave empty when yoe don't want to share your Elevenlabs Account with your players."
+            "MasterApiKeyHint":"The Elevenlabs API Key to be used by all clients without their own API-Key. Leave empty when yoe don't want to share your Elevenlabs Account with your players.",
+            "NarratorActor": "Narrating Actor (ID)",
+            "NarratorActorHint":"This actor takes on the role of the narrator. This means that the voice settings of this actor are used if either no actor has been selected with the /talk command or no voice settings have been made for that actor."
         },
         "controls": {
             "button.title": "Voice Settings"
