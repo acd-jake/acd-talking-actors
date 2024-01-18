@@ -2,7 +2,9 @@
     "acd.ta": {
         "settings": {
             "ApiKey": "API-Key",
-            "ApiKeyHint":"Your Elevenlabs API Key"
+            "ApiKeyHint":"Your Elevenlabs API Key",
+            "MasterApiKey": "Master-API-Key",
+            "MasterApiKeyHint":"The Elevenlabs API Key to be used by all clients without their own API-Key. Leave empty when yoe don't want to share your Elevenlabs Account with your players."
         },
         "controls": {
             "button.title": "Voice Settings"

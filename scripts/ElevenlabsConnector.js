@@ -7,14 +7,15 @@ export class ElevenlabsConnector {
     allVoices;
 
     async initializeMain() {
-        if (this.HasApiKey) {
+        if (this.hasApiKey()) {
             await this.getVoices();
             await this.getUserdata();
         }
     }
 
-    HasApiKey() {
-        return game.settings.get(MODULE.ID, MODULE.APIKEY) != undefined;
+    hasApiKey() {
+        return (game.settings.get(MODULE.ID, MODULE.APIKEY)?.length > 1)
+              || (game.settings.get(MODULE.ID, MODULE.MASTERAPIKEY)?.length > 1);
     }
 
     processChatMessage(chatlog, messageText, chatData) {
@@ -28,7 +29,7 @@ export class ElevenlabsConnector {
 
         messageText = messageData[2];
 
-        if (!this.HasApiKey) {
+        if (!this.hasApiKey()) {
             ui.notifications.error(localize("acd.ta.errors.noApiKey"));
             return false;
         }
