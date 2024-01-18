@@ -45,6 +45,19 @@ export class ElevenlabsConnector {
 
             voice_id = this.allVoices.filter(obj => { return obj.name === voiceName })[0]?.voice_id;
         }
+        // otherwise check the optional module Conversation Hud
+        else if (game.modules.get("conversation-hud")
+            && game.modules.get("conversation-hud").active
+            && game.ConversationHud.conversationIsSpeakingAs == true
+            && game.ConversationHud.activeConversation
+            && game.ConversationHud.activeConversation.activeParticipant != -1) {
+            let speakername = game.ConversationHud.activeConversation.participants[game.ConversationHud.activeConversation?.activeParticipant].name;
+            speakerActor = game.actors.find((t) => t.name == speakername);
+            if (speakerActor) {
+                chatData.speaker.actor = speakerActor._id;
+            }
+            chatData.speaker.alias = speakername;
+        }
         // otherwise check the optional module Yendor's Scene Actors
         else if (game.modules.get("yendors-scene-actors") 
             && game.modules.get("yendors-scene-actors").active
