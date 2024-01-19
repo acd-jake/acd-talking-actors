@@ -7,3 +7,4 @@ An Elevenlabs subscription is required for the module to work. https://beta.elev
 
 * This module is a spritual successor to the module "Elevenlabs for Foundry" by Vexthecollector (https://github.com/Vexthecollector/elevenlabs-for-foundry/tree/main).
 * This module optionally uses the [Yendors Scene Actors](https://foundryvtt.com/packages/yendors-scene-actors) module if this is installed. If an actor is set to focus in the Scene Actors module, it is used for the voice output and does not need to have a token in the active scene. (Added in version 0.4)
+* This module optionally uses the [Conversation Hud](https://foundryvtt.com/packages/conversation-hud) module if this is installed. If the "Speak As" option is set in the Conversation Hud module, the active conversation participant is used for the voice output and does not need to have a token in the active scene. (Added in version 0.5)

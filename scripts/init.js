@@ -8,6 +8,16 @@ export let localize = key => {
 
 Hooks.once("init", async function () {
 
+    game.settings.register(MODULE.ID, MODULE.MASTERAPIKEY, {
+        name: localize("acd.ta.settings.MasterApiKey"),
+        hint: localize("acd.ta.settings.MasterApiKeyHint"),
+        scope: "world",
+        config: true,
+        type: String,
+        onChange: value => { game.talkingactors.connector.initializeMain() },
+        requiresReload: true 
+    });
+
     game.settings.register(MODULE.ID, MODULE.APIKEY, {
         name: localize("acd.ta.settings.ApiKey"),
         hint: localize("acd.ta.settings.ApiKeyHint"),
@@ -16,6 +26,16 @@ Hooks.once("init", async function () {
         type: String,
         onChange: value => { game.talkingactors.connector.initializeMain() }
     });
+
+    game.settings.register(MODULE.ID, MODULE.NARRATORACTOR, {
+        name: localize("acd.ta.settings.NarratorActor"),
+        hint: localize("acd.ta.settings.NarratorActorHint"),
+        scope: "client",
+        config: true,
+        type: String,
+        onChange: value => { game.talkingactors.connector.initializeMain() }
+    });
+
 
     game.talkingactors = {
         connector: new ElevenlabsConnector()

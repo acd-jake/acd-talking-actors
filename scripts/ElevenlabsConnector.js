@@ -7,14 +7,15 @@ export class ElevenlabsConnector {
     allVoices;
 
     async initializeMain() {
-        if (this.HasApiKey) {
+        if (this.hasApiKey()) {
             await this.getVoices();
             await this.getUserdata();
         }
     }
 
-    HasApiKey() {
-        return game.settings.get(MODULE.ID, MODULE.APIKEY) != undefined;
+    hasApiKey() {
+        return (game.settings.get(MODULE.ID, MODULE.APIKEY)?.length > 1)
+              || (game.settings.get(MODULE.ID, MODULE.MASTERAPIKEY)?.length > 1);
     }
 
     processChatMessage(chatlog, messageText, chatData) {
@@ -28,7 +29,7 @@ export class ElevenlabsConnector {
 
         messageText = messageData[2];
 
-        if (!this.HasApiKey) {
+        if (!this.hasApiKey()) {
             ui.notifications.error(localize("acd.ta.errors.noApiKey"));
             return false;
         }
@@ -76,13 +77,28 @@ export class ElevenlabsConnector {
             speakerActor = game.actors.get(chatData.speaker.actor);
         }
 
-        // check if a voice is configured for the talking character
-        if (speakerActor) {
-            const moduleFlags = speakerActor.flags[MODULE.ID];
-            voice_id = moduleFlags ? moduleFlags[FLAGS.VOICE_ID] : undefined;
-            settings = moduleFlags ? moduleFlags[FLAGS.VOICE_SETTINGS] : undefined;
-
+        // if no actor has been found yet, check if a narrating actor has been specified in the settings
+        if (!speakerActor) {
+            const narratingActorId = game.settings.get(MODULE.ID,MODULE.NARRATORACTOR);
+            if (narratingActorId)
+            {
+                speakerActor = game.actors.find((a) => a._id == narratingActorId);
+                chatData.speaker.actor = narratingActorId;
+            }
         }
+
+        // check if a voice is configured for the talking character
+        ({ voice_id, settings } = this.getVoiceIdAndSettingsFromActor(speakerActor));
+
+        // if no voice seeting have been found, try to use the settings for the narrating actor
+        if (!voice_id) {
+            const narratingActorId = game.settings.get(MODULE.ID,MODULE.NARRATORACTOR);
+            if (narratingActorId) {
+                speakerActor = game.actors.find((a) => a._id == narratingActorId);
+                ({ voice_id, settings } = this.getVoiceIdAndSettingsFromActor(speakerActor));
+            }
+        }
+
         console.log(voice_id)
 
         if (voice_id) {
@@ -93,6 +109,18 @@ export class ElevenlabsConnector {
             this.postToChat(chatData,``, messageText);
         }
         return false;
+    }
+
+    getVoiceIdAndSettingsFromActor(speakerActor) {
+        let voice_id;
+        let settings;
+
+        if (speakerActor) {
+            const moduleFlags = speakerActor.flags[MODULE.ID];
+            voice_id = moduleFlags ? moduleFlags[FLAGS.VOICE_ID] : undefined;
+            settings = moduleFlags ? moduleFlags[FLAGS.VOICE_SETTINGS] : undefined;
+        }
+        return { voice_id, settings };
     }
 
     postToChat(chatData, flavor, messageText) {
