@@ -15,7 +15,7 @@ export class ElevenlabsConnector {
 
     hasApiKey() {
         return (game.settings.get(MODULE.ID, MODULE.APIKEY)?.length > 1)
-              || (game.settings.get(MODULE.ID, MODULE.MASTERAPIKEY)?.length > 1);
+            || (game.settings.get(MODULE.ID, MODULE.MASTERAPIKEY)?.length > 1);
     }
 
     processChatMessage(chatlog, messageText, chatData) {
@@ -37,8 +37,8 @@ export class ElevenlabsConnector {
         let voice_id;
         let settings;
         let speakerActor;
-        
-        // do we have a voicename specified (e.g. "/talk [Dave] ...")? 
+
+        // do we have a voicename specified (e.g. "/talk [Dave] ...")?
         // This will override the voice configured for the talking actor
         if (messageData = messageText.match("^\\[([a-zA-z0-9]+)\\] ((.|[\r\n])*)$")) {
             let voiceName = messageData[1];
@@ -46,55 +46,53 @@ export class ElevenlabsConnector {
 
             voice_id = this.allVoices.filter(obj => { return obj.name === voiceName })[0]?.voice_id;
         }
-        // otherwise check the optional module Conversation Hud
-        else if (game.modules.get("conversation-hud")
-            && game.modules.get("conversation-hud").active
-            && game.ConversationHud.conversationIsSpeakingAs == true
-            && game.ConversationHud.activeConversation
-            && game.ConversationHud.activeConversation.activeParticipant != -1) {
-            let speakername = game.ConversationHud.activeConversation.participants[game.ConversationHud.activeConversation?.activeParticipant].name;
-            speakerActor = game.actors.find((t) => t.name == speakername);
+        // otherwise check if an actor has been spefied for the talk command, e.g. "/talk {Actor} ..."
+        else if (messageData = messageText.match("^{([a-zA-z0-9 ]+)} ((.|[\r\n])*)$")) {
+            let actorId = messageData[1];
+            messageText = messageData[2];
+            speakerActor = game.actors.find((a) => a._id == actorId);
+            if (!speakerActor) {
+                speakerActor = game.actors.find((a) => a.name == actorId);
+            }
+
             if (speakerActor) {
                 chatData.speaker.actor = speakerActor._id;
-            }
-            chatData.speaker.alias = speakername;
-        }
-        // otherwise check the optional module Yendor's Scene Actors
-        else if (game.modules.get("yendors-scene-actors") 
-            && game.modules.get("yendors-scene-actors").active
-            && game.yendorsSceneActors.show
-            && game.yendorsSceneActors.actorFocusId != null) {
-            speakerActor = game.yendorsSceneActors.actorsDetail.find((t) => t._id == game.yendorsSceneActors.actorFocusId)
-            chatData.speaker.actor = game.yendorsSceneActors.actorFocusId;
-            if ( speakerActor.flags["yendors-scene-actors"]?.isNameRevealed )  {
                 chatData.speaker.alias = speakerActor.name;
-            } else {
-                chatData.speaker.alias = localize("acd.ta.chat.unknownSpeaker");
+                // check if a voice is configured for the talking character
+                ({ voice_id, settings } = this.getVoiceIdAndSettingsFromActor(speakerActor));
             }
         }
-        // otherwise get the standard speaking actor
-        else if (chatData && chatData.speaker && chatData.speaker.actor) {
-            speakerActor = game.actors.get(chatData.speaker.actor);
-        }
+        // otherwise
+        else {
+            // check the optional module Conversation Hud
+            speakerActor = this.tryGetSpeakerActorAndChatDataForConversationHud(chatData);
 
-        // if no actor has been found yet, check if a narrating actor has been specified in the settings
-        if (!speakerActor) {
-            const narratingActorId = game.settings.get(MODULE.ID,MODULE.NARRATORACTOR);
-            if (narratingActorId)
-            {
-                speakerActor = game.actors.find((a) => a._id == narratingActorId);
-                chatData.speaker.actor = narratingActorId;
+            // otherwise check the optional module Yendor's Scene Actors
+            if (!speakerActor) {
+                speakerActor = this.tryGetSpeakerActorAndChatDataForSceneActors(chatData);
             }
-        }
 
-        // check if a voice is configured for the talking character
-        ({ voice_id, settings } = this.getVoiceIdAndSettingsFromActor(speakerActor));
+            // otherwise get the standard speaking actor
+            if (!speakerActor) {
+                speakerActor = this.tryGetStandardSpeakerActor(chatData);
+            }
+
+            // if no actor has been found yet, check if a narrating actor has been specified in the settings
+            if (!speakerActor) {
+                speakerActor = this.tryGetSpeakerActorForNarratingActor();
+                if (speakerActor) {
+                    chatData.speaker.actor = speakerActor;
+                }
+            }
+
+            // check if a voice is configured for the talking character
+            ({ voice_id, settings } = this.getVoiceIdAndSettingsFromActor(speakerActor));
+        }
 
         // if no voice seeting have been found, try to use the settings for the narrating actor
         if (!voice_id) {
-            const narratingActorId = game.settings.get(MODULE.ID,MODULE.NARRATORACTOR);
-            if (narratingActorId) {
-                speakerActor = game.actors.find((a) => a._id == narratingActorId);
+            speakerActor = this.tryGetSpeakerActorForNarratingActor();
+            if (speakerActor) {
                 ({ voice_id, settings } = this.getVoiceIdAndSettingsFromActor(speakerActor));
             }
         }
@@ -106,9 +104,58 @@ export class ElevenlabsConnector {
             this.postToChat(chatData, localize("acd.ta.chat.textTalked"), `<span class="acd-ta-talked">${messageText}</span>`);
         } else {
             ui.notifications.error(localize("acd.ta.errors.unknownVoice"));
-            this.postToChat(chatData,``, messageText);
+            this.postToChat(chatData, ``, messageText);
         }
         return false;
+    }
+
+    tryGetSpeakerActorForNarratingActor() {
+        let actor;
+        const narratingActorId = game.settings.get(MODULE.ID, MODULE.NARRATORACTOR);
+        if (narratingActorId) {
+            actor = game.actors.find((a) => a._id == narratingActorId);
+        }
+        return actor;
+    }
+
+    tryGetStandardSpeakerActor(chatData) {
+        let actor;
+        if (chatData && chatData.speaker && chatData.speaker.actor) {
+            actor = game.actors.get(chatData.speaker.actor);
+        }
+        return actor;
+    }
+
+    tryGetSpeakerActorAndChatDataForSceneActors(chatData) {
+        let actor;
+        let modulename = "yendors-scene-actors";
+        if (this.isModuleActive(modulename)
+            && game.yendorsSceneActors.actorFocusId != null) {
+            actor = game.yendorsSceneActors.actorsDetail.find((t) => t._id == game.yendorsSceneActors.actorFocusId);
+            chatData.speaker.actor = game.yendorsSceneActors.actorFocusId;
+            if (actor.flags[modulename]?.isNameRevealed) {
+                chatData.speaker.alias = actor.name;
+            } else {
+                chatData.speaker.alias = localize("acd.ta.chat.unknownSpeaker");
+            }
+        }
+        return actor;
+    }
+
+
+    tryGetSpeakerActorAndChatDataForConversationHud(chatData) {
+        let actor;
+        let modulename = "conversation-hud";
+        if (this.isModuleActive(modulename)
+            && game.ConversationHud.conversationIsSpeakingAs == true
+            && game.ConversationHud.activeConversation
+            && game.ConversationHud.activeConversation.activeParticipant != -1) {
+            let speakername = game.ConversationHud.activeConversation.participants[game.ConversationHud.activeConversation?.activeParticipant].name;
+            actor = game.actors.find((t) => t.name == speakername);
+            chatData.speaker.actor = actor;
+            chatData.speaker.alias = speakername;
+        }
+        return actor;
     }
 
     getVoiceIdAndSettingsFromActor(speakerActor) {
@@ -121,6 +168,11 @@ export class ElevenlabsConnector {
             settings = moduleFlags ? moduleFlags[FLAGS.VOICE_SETTINGS] : undefined;
         }
         return { voice_id, settings };
+    }
+
+    isModuleActive(modulename) {
+        return game.modules.get(modulename)
+            && game.modules.get(modulename).active;
     }
 
     postToChat(chatData, flavor, messageText) {
