@@ -16,13 +16,32 @@
     "lang": "de",
     "name": "Deutsch",
     "path": "language/de.json"
-}
-],
+  }
+  ],
   "styles": [
     "styles/ta-styles.css"
   ],
   "esmodules": [
     "scripts/init.js"
+  ],
+  "packFolders": [
+    {
+      "name": "TA Macros",
+      "packs": [
+        "talking-actors"
+      ]
+    }
+  ],
+  "packs": [
+    {
+      "name": "talking-actors",
+      "label": "Talking Actors Macros",
+      "path": "packs/talking-actors.db",
+      "type": "Macro",
+      "ownership": {
+        "PLAYER": "OBSERVER"
+      }
+    }
   ],
   "socket": true,
   "description": "Selectable and adjustable voices for FoundryVTT actors through Elevenlabs integration.\\nSimply configure the voice for an actor and use the /talk chat command in the chat to hear him talk.\\nAn Elevenlabs subscription is required for the API Key.",
