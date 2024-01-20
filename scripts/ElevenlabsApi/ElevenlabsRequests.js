@@ -28,6 +28,14 @@ class ElevenlabsRequest {
         }).then(response => response.text());
     };
 
+    async fetchResponse(command) {
+        return await fetch(`${this.api_url}${command}`, {
+            headers: {
+                'accept': 'application/json',
+                'xi-api-key': this.api_key
+            }
+        })
+    }
     async postData(command, acceptType, body) {
         let response = await fetch(`${this.api_url}${command}`, {
             method: 'POST',
@@ -41,6 +49,7 @@ class ElevenlabsRequest {
         return response;
     }
 }
+
 export class TextToSpeechRequest extends ElevenlabsRequest {
     voiceId;
     text;
@@ -75,6 +84,28 @@ export class TextToSpeechRequest extends ElevenlabsRequest {
         return response;
     }
 }
+
+export class ReplaySpeechRequest extends ElevenlabsRequest {
+    itemId;
+
+    constructor (itemId) {
+        super();
+        this.itemId = itemId;
+    }
+
+    async fetch() {
+        return await super.fetchResponse(`history/${this.itemId}/audio`, {});
+    }
+}
+
+export class GetLastHistoryItemRequest extends ElevenlabsRequest {
+    async fetch () {
+        let response = await super.fetchJson('history?page_size=1')
+            .then(text => JSON.parse(text));
+        return response.last_history_item_id;
+    }
+}
+
 export class GetVoicesRequest extends ElevenlabsRequest {
     async fetch() {
         let allVoices;
@@ -85,6 +116,7 @@ export class GetVoicesRequest extends ElevenlabsRequest {
         return allVoices;
     }
 }
+
 export class GetUserDataRequest extends ElevenlabsRequest {
     async fetch() {
         let subscriptionInfo = await super.fetchJson('user/subscription')
@@ -93,6 +125,7 @@ export class GetUserDataRequest extends ElevenlabsRequest {
         return subscriptionInfo;
     }
 }
+
 export class GetVoiceSettingsRequest extends ElevenlabsRequest {
     voiceId;
 
