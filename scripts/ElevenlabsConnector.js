@@ -1,16 +1,23 @@
 import { MODULE, FLAGS } from './constants.js';
 import { localize } from './init.js';
-import { GetUserDataRequest, GetVoicesRequest, GetVoiceSettingsRequest, TextToSpeechRequest } from './ElevenlabsApi/ElevenlabsRequests.js';
+import { GetUserDataRequest, GetVoicesRequest, GetVoiceSettingsRequest, TextToSpeechRequest, GetLastHistoryItemRequest, ReplaySpeechRequest } from './ElevenlabsApi/ElevenlabsRequests.js';
 
 export class ElevenlabsConnector {
     subscriptionInfo;
     allVoices;
+    playedSounds;
 
     async initializeMain() {
         if (this.hasApiKey()) {
             await this.getVoices();
             await this.getUserdata();
+
+            let that = this;
+
+            $(document).on('click', '.acd-ta-replay', function () { that.replaySpeech($(this).data('item-id')); })
         }
+
+        this.playedSounds =[];
     }
 
     hasApiKey() {
@@ -100,8 +107,8 @@ export class ElevenlabsConnector {
         console.log(voice_id)
 
         if (voice_id) {
-            this.textToSpeech(voice_id, messageText, settings);
-            this.postToChat(chatData, localize("acd.ta.chat.textTalked"), `<span class="acd-ta-talked">${messageText}</span>`);
+            let chatMessagePromise = this.postToChat(chatData, `${localize("acd.ta.chat.textTalked")}`, `<span class="acd-ta-talked">${messageText}</span>`);
+            this.textToSpeech(voice_id, messageText, settings, chatlog, chatMessagePromise);
         } else {
             ui.notifications.error(localize("acd.ta.errors.unknownVoice"));
             this.postToChat(chatData, ``, messageText);
@@ -183,7 +190,7 @@ export class ElevenlabsConnector {
             type: CONST.CHAT_MESSAGE_TYPES.OOC,
             content: messageText,
         };
-        ChatMessage.create(messageData, { chatBubble: true });
+        return ChatMessage.create(messageData, { chatBubble: true });
     }
 
     async getUserdata() {
@@ -200,12 +207,30 @@ export class ElevenlabsConnector {
         return new GetVoiceSettingsRequest(voiceId).fetch();
     }
 
-    async textToSpeech(voiceId, text, settings) {
+    async textToSpeech(voiceId, text, settings, chatlog, chatMessagePromise) {
         let container = await new TextToSpeechRequest(voiceId, text, settings).fetch();
 
         let chunks = await this.readChunks(container);
         game.socket.emit('module.' + MODULE.ID, { testarg: "Hello World", container: chunks })
-        this.playSound(chunks);
+
+        let history_item_id = await new GetLastHistoryItemRequest().fetch();
+        this.playSound(chunks, history_item_id);
+
+
+        let chatMessage = await chatMessagePromise;
+        await this.updateChatMessageFlavor(history_item_id, chatMessage, {showPlay:true});
+        chatlog.updateMessage(chatMessage)
+    }
+
+    async updateChatMessageFlavor(history_item_id, chatMessage, options ={}) {
+        let newflavor = `${localize("acd.ta.chat.textTalked")}`;
+
+        if(options.showPlay){
+            newflavor = newflavor.concat(`<span class="acd-ta-replay" data-item-id="${history_item_id}"><i class="fa-solid fa-repeat"></i></span>`);
+        }
+
+        await chatMessage.update({ 'flavor': newflavor });
+        chatMessage;
     }
 
     async readChunks(container) {
@@ -219,14 +244,28 @@ export class ElevenlabsConnector {
         return chunks;
     }
 
-    async playSound(chunks) {
+    async playSound(chunks, itemId) {
         let blob = new Blob(chunks, { type: 'audio/mpeg' })
         let url = window.URL.createObjectURL(blob)
-        this.playAudio(url);
+        let sound = this.playAudio(url);
+        let resolvedSound = Promise.resolve(sound);
+        resolvedSound.then( (soundInfo) => {
+            console.log(soundInfo);
+        })
     }
 
-    playAudio(url) {
-        AudioHelper.play({ src: url, volume: 1.0, loop: false }, false);
+    async replaySpeech(itemId)
+    {
+        let container = await new ReplaySpeechRequest(itemId).fetch();
+
+        let chunks = await this.readChunks(container);
+        game.socket.emit('module.' + MODULE.ID, { testarg: "Hello World", container: chunks })
+        this.playSound(chunks, itemId);
+
+    }
+
+    async playAudio(url) {
+        return AudioHelper.play({ src: url, volume: 1.0, loop: false }, false);
     }
 
     async playSample(voiceId) {
