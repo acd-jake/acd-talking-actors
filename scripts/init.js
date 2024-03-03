@@ -36,6 +36,15 @@ Hooks.once("init", async function () {
         onChange: value => { game.talkingactors.connector.initializeMain() }
     });
 
+    game.settings.register(MODULE.ID, MODULE.ALLOWUSERS, {
+		name: 'acd.ta.settings.AllowUsers',
+		hint: 'acd.ta.settings.AllowUsersHint',
+		config: true,
+		scope: 'world',
+		type: Boolean,
+		default: true,
+	});
+
 
     game.talkingactors = {
         connector: new ElevenlabsConnector()
@@ -43,6 +52,13 @@ Hooks.once("init", async function () {
 
     await game.talkingactors.connector.initializeMain();
 });
+
+function isModuleAccessible() {
+    let moduleAccessible = false;
+    const allowUsers = game.settings.get(MODULE.ID, MODULE.ALLOWUSERS);
+    moduleAccessible = (allowUsers || game.user.isGM);
+    return moduleAccessible;
+}
 
 Hooks.on("getSceneControlButtons", (controls, b, c) => {
     controls
