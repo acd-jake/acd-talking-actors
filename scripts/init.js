@@ -61,6 +61,10 @@ function isModuleAccessible() {
 }
 
 Hooks.on("getSceneControlButtons", (controls, b, c) => {
+    if (!isModuleAccessible()) {
+        return;
+    }
+
     controls
         .find((x) => x.name == "token")
         .tools.push({
