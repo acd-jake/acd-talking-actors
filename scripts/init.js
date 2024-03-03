@@ -6,16 +6,16 @@ export let localize = key => {
     return game.i18n.localize(key);
 };
 
-Hooks.once("init", async function () {
 
+function registerSettings() {
     game.settings.register(MODULE.ID, MODULE.MASTERAPIKEY, {
         name: localize("acd.ta.settings.MasterApiKey"),
         hint: localize("acd.ta.settings.MasterApiKeyHint"),
         scope: "world",
         config: true,
         type: String,
-        onChange: value => { game.talkingactors.connector.initializeMain() },
-        requiresReload: true 
+        onChange: value => { game.talkingactors.connector.initializeMain(); },
+        requiresReload: true
     });
 
     game.settings.register(MODULE.ID, MODULE.APIKEY, {
@@ -24,26 +24,89 @@ Hooks.once("init", async function () {
         scope: "client",
         config: true,
         type: String,
-        onChange: value => { game.talkingactors.connector.initializeMain() }
+        onChange: value => { game.talkingactors.connector.initializeMain(); }
     });
 
     game.settings.register(MODULE.ID, MODULE.NARRATORACTOR, {
         name: localize("acd.ta.settings.NarratorActor"),
         hint: localize("acd.ta.settings.NarratorActorHint"),
-        scope: "client",
+        scope: "world",
         config: true,
         type: String,
-        onChange: value => { game.talkingactors.connector.initializeMain() }
+        onChange: value => { game.talkingactors.connector.initializeMain(); }
     });
 
     game.settings.register(MODULE.ID, MODULE.ALLOWUSERS, {
-		name: 'acd.ta.settings.AllowUsers',
-		hint: 'acd.ta.settings.AllowUsersHint',
-		config: true,
-		scope: 'world',
-		type: Boolean,
-		default: true,
+        name: 'acd.ta.settings.AllowUsers',
+        hint: 'acd.ta.settings.AllowUsersHint',
+        config: true,
+        scope: 'world',
+        type: Boolean,
+        default: true,
+    });
+}
+
+function isModuleAccessible() {
+    let moduleAccessible = false;
+    const allowUsers = game.settings.get(MODULE.ID, MODULE.ALLOWUSERS);
+    moduleAccessible = (allowUsers || game.user.isGM);
+    return moduleAccessible;
+}
+
+function openVoiceEditor(actors) {
+    if (!actors || actors.length == 0) return;
+
+	new VoiceSettingsApp(actors).render(true);
+}
+
+
+function injectActorSheetHeaderButton(sheet, buttons) {
+    if (!isModuleAccessible()) {
+        return;
+    }
+
+	buttons.unshift({
+		class: 'edit-voicesetting',
+		icon: 'fas fa-comments',
+		label: localize("acd.ta.controls.headerbutton.title"),
+		onclick: _ => openVoiceEditor([sheet.document]),
 	});
+}
+
+function injectActorDirectoryEntryContextButton([directory], entries) {
+	entries.push({
+		name: 'acd.ta.controls.button.title',
+		icon: '<i class="fas fa-comment"></i>',
+		condition: () => {
+			return isModuleAccessible();
+		},
+		callback: async ([entry]) => {
+			const directoryId = directory.id,
+				documentId = entry.dataset.documentId;
+			let actor;
+
+            if (directoryId === 'actors') {
+				actor = game.actors.get(documentId);
+            }
+			else {
+                ui.notifications.warn('Only Actors are supported:', { directory, entry })
+            }
+			
+            if (actor) {
+                openVoiceEditor([actor]);
+            }
+			else {
+                ui.notifications.warn('Actor not found:', { documentId, directoryId })
+            }
+		}
+	});
+}
+
+
+
+Hooks.once("init", async function () {
+
+    registerSettings();
 
 
     game.talkingactors = {
@@ -52,13 +115,6 @@ Hooks.once("init", async function () {
 
     await game.talkingactors.connector.initializeMain();
 });
-
-function isModuleAccessible() {
-    let moduleAccessible = false;
-    const allowUsers = game.settings.get(MODULE.ID, MODULE.ALLOWUSERS);
-    moduleAccessible = (allowUsers || game.user.isGM);
-    return moduleAccessible;
-}
 
 Hooks.on("getSceneControlButtons", (controls, b, c) => {
     if (!isModuleAccessible()) {
@@ -78,20 +134,19 @@ Hooks.on("getSceneControlButtons", (controls, b, c) => {
                     ui.notifications.warn(localize("acd.ta.errors.notAllLinkedActors"));
                 }
 
-                new VoiceSettingsApp(linkedActors).render(true);
+                openVoiceEditor(linkedActors);
             },
             button: true,
         });
 });
 
-Handlebars.registerHelper('ifEquals', function (arg1, arg2, options) {
-    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
-});
+
+Hooks.on('getActorSheetHeaderButtons', injectActorSheetHeaderButton);
+Hooks.on('getActorDirectoryEntryContext', injectActorDirectoryEntryContextButton);
 
 Hooks.on("chatMessage", (chatlog, messageText, chatData) => {
     return game.talkingactors.connector.processChatMessage(chatlog, messageText, chatData);
 });
-
 
 Hooks.on("ready", () => {
     game.socket.on('module.' + MODULE.ID, ({ testarg, container }) => {
@@ -99,4 +154,7 @@ Hooks.on("ready", () => {
     });
 })
 
+Handlebars.registerHelper('ifEquals', function (arg1, arg2, options) {
+    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
 
