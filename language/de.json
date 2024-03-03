@@ -11,7 +11,9 @@
 			"AllowUsersHint": "Ist diese Option aktiv, haben Benutzer, die kein Spielleiter sind, Zugriff auf dieses Modul."
         },
         "controls": {
-            "button.title": "Stimmeinstellungen"
+            "button.title": "Stimmeinstellungen",
+            "readAloud": "Laut lesen (Sprecher)",
+            "readAloudCurrentActor": "Laut lesen (Akteur)"
         },
         "VoiceSettings": {
             "Title" : "Stimmeinstellungen für den Akteur",

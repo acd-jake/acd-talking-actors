@@ -11,7 +11,9 @@
 			"AllowUsersHint": "If enabled, users have access to the module."
         },
         "controls": {
-            "button.title": "Voice Settings"
+            "button.title": "Voice Settings",
+            "readAloud": "Read Aloud (Narrator)",
+            "readAloudCurrentActor": "Read Aloud (Actor)"
         },
         "VoiceSettings": {
             "Title" : "Voice Settings for Actors",

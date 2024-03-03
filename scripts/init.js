@@ -97,6 +97,15 @@ Hooks.on("ready", () => {
     game.socket.on('module.' + MODULE.ID, ({ testarg, container }) => {
         game.talkingactors.connector.playSound(container)
     });
+
+    document.addEventListener('contextmenu', (ev) => {
+        if (ev.target.classList.contains('journal-entry-pages') ||
+                $(ev.target).parents('div.journal-entry-pages').length ||
+                ev.target.classList.contains('editor-content') ||
+                $(ev.target).parents('div.editor-content').length) {
+                    game.talkingactors.connector.showContextMenu(ev);
+                }
+    });
 })
 
 

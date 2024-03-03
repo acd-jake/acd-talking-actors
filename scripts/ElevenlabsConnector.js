@@ -2,10 +2,13 @@ import { MODULE, FLAGS } from './constants.js';
 import { localize } from './init.js';
 import { GetUserDataRequest, GetVoicesRequest, GetVoiceSettingsRequest, TextToSpeechRequest, GetLastHistoryItemRequest, ReplaySpeechRequest } from './ElevenlabsApi/ElevenlabsRequests.js';
 
+
+
 export class ElevenlabsConnector {
     subscriptionInfo;
     allVoices;
     playedSounds;
+    contextMenu;
 
     async initializeMain() {
         if (this.hasApiKey()) {
@@ -17,7 +20,33 @@ export class ElevenlabsConnector {
             $(document).on('click', '.acd-ta-replay', function () { that.replaySpeech($(this).data('item-id')); })
         }
 
-        this.playedSounds =[];
+        this.playedSounds = [];
+
+        this.contextMenu = new ContextMenuNT({
+            theme: 'default',
+            items: [
+                {
+                    icon: 'comment',
+                    name: localize("acd.ta.controls.readAloud"),
+                    action: () => {
+                        const selection = this.getSelectionText();
+                        if (selection)
+                            this.readAloud(selection);
+                        this.contextMenu.hide()
+                    },
+                },
+                {
+                    icon: 'comment',
+                    name: localize("acd.ta.controls.readAloudCurrentActor"),
+                    action: () => {
+                        const selection = this.getSelectionText();
+                        if (selection)
+                            this.readAloudCurrentActor(selection);
+                        this.contextMenu.hide()
+                    },
+                },
+            ],
+        });
     }
 
     hasApiKey() {
@@ -218,14 +247,14 @@ export class ElevenlabsConnector {
 
 
         let chatMessage = await chatMessagePromise;
-        await this.updateChatMessageFlavor(history_item_id, chatMessage, {showPlay:true});
+        await this.updateChatMessageFlavor(history_item_id, chatMessage, { showPlay: true });
         chatlog.updateMessage(chatMessage)
     }
 
-    async updateChatMessageFlavor(history_item_id, chatMessage, options ={}) {
+    async updateChatMessageFlavor(history_item_id, chatMessage, options = {}) {
         let newflavor = `${localize("acd.ta.chat.textTalked")}`;
 
-        if(options.showPlay){
+        if (options.showPlay) {
             newflavor = newflavor.concat(`<span class="acd-ta-replay" data-item-id="${history_item_id}"><i class="fa-solid fa-repeat"></i></span>`);
         }
 
@@ -249,13 +278,12 @@ export class ElevenlabsConnector {
         let url = window.URL.createObjectURL(blob)
         let sound = this.playAudio(url);
         let resolvedSound = Promise.resolve(sound);
-        resolvedSound.then( (soundInfo) => {
+        resolvedSound.then((soundInfo) => {
             console.log(soundInfo);
         })
     }
 
-    async replaySpeech(itemId)
-    {
+    async replaySpeech(itemId) {
         let container = await new ReplaySpeechRequest(itemId).fetch();
 
         let chunks = await this.readChunks(container);
@@ -274,6 +302,44 @@ export class ElevenlabsConnector {
         if (voice) {
             this.playAudio(voice.preview_url);
         }
+    }
+
+    async showContextMenu(event) {
+        const time = this.contextMenu.isOpen() ? 100 : 0;
+        this.contextMenu.hide();
+        setTimeout(() => {
+            this.contextMenu.show(event.pageX, event.pageY);
+        }, time);
+    }
+
+    getSelectionText() {
+        let html = '';
+        const selection = window.getSelection();
+        if (selection?.rangeCount && !selection.isCollapsed) {
+            const fragments = selection.getRangeAt(0).cloneContents();
+            const size = fragments.childNodes.length;
+            for (let i = 0; i < size; i++) {
+                if (fragments.childNodes[i].nodeType == fragments.TEXT_NODE)
+                    html += fragments.childNodes[i].wholeText;
+                else
+                    html += fragments.childNodes[i].outerHTML;
+            }
+        }
+        if (!html) {
+        }
+        return html;
+    }
+
+    readAloud(message, options = {}) {
+        message = `/talk {${this.tryGetSpeakerActorForNarratingActor()?._id}} ${message.replace(/\\n/g, '<br>')}`;
+
+        ui.chat.processMessage(message);
+    }
+
+    readAloudCurrentActor(message, options = {}) {
+        message = `/talk ${message.replace(/\\n/g, '<br>')}`;
+
+        ui.chat.processMessage(message);
     }
 }
 
