@@ -4,14 +4,15 @@
             "ApiKey": "API-Key",
             "ApiKeyHint":"Dein API Key von Elevenlabs",
             "MasterApiKey": "Haupt-API-Key",
-            "MasterApiKeyHint":"Der Elevenlabs API Key, der von allen Clients genutzt wird, für die kein eigenen API Key angegeben wurde. Lasse ihn frei, wenn Du Deinen Elevenlabs Account nicht mit deinen Spielern teilen möchtest.",
+            "MasterApiKeyHint":"Der Elevenlabs API Key, der von allen Clients genutzt wird, für die kein eigener API Key angegeben wurde. Lasse ihn frei, wenn Du Deinen Elevenlabs Account nicht mit deinen Spielern teilen möchtest.",
             "NarratorActor": "Erzählender Akteur (ID)",
-            "NarratorActorHint":"Dieser Akteur übernimmt die Rolle des Erzählers. Das bedeutet, dass die Stimmeinstellungen dieses Akteurs benutzt werden, wenn entweder kein Akteur beim /talk Kommando ausgewählt wurde oder keine Stimmeinstellungen für diesen vorgenommen wurden.",
+            "NarratorActorHint":"Der Akteur mit diesem Dokument-Id übernimmt die Rolle des Erzählers. Das bedeutet, dass die Stimmeinstellungen dieses Akteurs benutzt werden, wenn entweder kein Akteur beim /talk Kommando ausgewählt wurde oder keine Stimmeinstellungen für diesen vorgenommen wurden.",
             "AllowUsers": "Benutzer erlaubt",
 			"AllowUsersHint": "Ist diese Option aktiv, haben Benutzer, die kein Spielleiter sind, Zugriff auf dieses Modul."
         },
         "controls": {
-            "button.title": "Stimmeinstellungen"
+            "button.title": "Stimmeinstellungen",
+            "headerbutton.title": "Stimme"
         },
         "VoiceSettings": {
             "Title" : "Stimmeinstellungen für den Akteur",
