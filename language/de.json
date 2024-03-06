@@ -8,7 +8,9 @@
             "NarratorActor": "Erzählender Akteur (ID)",
             "NarratorActorHint": "Der Akteur mit diesem Dokument-Id übernimmt die Rolle des Erzählers. Das bedeutet, dass die Stimmeinstellungen dieses Akteurs benutzt werden, wenn entweder kein Akteur beim /talk Kommando ausgewählt wurde oder keine Stimmeinstellungen für diesen vorgenommen wurden.",
             "AllowUsers": "Benutzer erlaubt",
-            "AllowUsersHint": "Ist diese Option aktiv, haben Benutzer, die kein Spielleiter sind, Zugriff auf dieses Modul."
+            "AllowUsersHint": "Ist diese Option aktiv, haben Benutzer, die kein Spielleiter sind, Zugriff auf dieses Modul.",
+            "EnableSelectionContextMenu": "Aktiviere Kontextmenü für ausgewählten Text",
+            "EnableSelectionContextMenuHint": "Wenn diese Option aktiviert ist, wird in Journaleinträgen ein Kontextmenü angezeigt, um die ausgewählten Textteile vorzulesen. (Nicht kompatibel mit dem Modul \"Narrator Tools\")"
         },
         "controls": {
             "button.title": "Stimmeinstellungen",

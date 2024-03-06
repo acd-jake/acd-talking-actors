@@ -22,31 +22,8 @@ export class ElevenlabsConnector {
 
         this.playedSounds = [];
 
-        this.contextMenu = new ContextMenuNT({
-            theme: 'default',
-            items: [
-                {
-                    icon: 'comment',
-                    name: localize("acd.ta.controls.readAloud"),
-                    action: () => {
-                        const selection = this.getSelectionText();
-                        if (selection)
-                            this.readAloud(selection);
-                        this.contextMenu.hide()
-                    },
-                },
-                {
-                    icon: 'comment',
-                    name: localize("acd.ta.controls.readAloudCurrentActor"),
-                    action: () => {
-                        const selection = this.getSelectionText();
-                        if (selection)
-                            this.readAloudCurrentActor(selection);
-                        this.contextMenu.hide()
-                    },
-                },
-            ],
-        });
+        this.createJournalContextMenu();
+
     }
 
     hasApiKey() {
@@ -166,6 +143,7 @@ export class ElevenlabsConnector {
         let actor;
         let modulename = "yendors-scene-actors";
         if (this.isModuleActive(modulename)
+            && game.yendorsSceneActors.show
             && game.yendorsSceneActors.actorFocusId != null) {
             actor = game.yendorsSceneActors.actorsDetail.find((t) => t._id == game.yendorsSceneActors.actorFocusId);
             chatData.speaker.actor = game.yendorsSceneActors.actorFocusId;
@@ -312,6 +290,34 @@ export class ElevenlabsConnector {
         }, time);
     }
 
+    createJournalContextMenu() {
+        this.contextMenu = new ContextMenuNT({
+            theme: 'default',
+            items: [
+                {
+                    icon: 'comment',
+                    name: localize("acd.ta.controls.readAloud"),
+                    action: () => {
+                        const selection = this.getSelectionText();
+                        if (selection)
+                            this.readAloud(selection);
+                        this.contextMenu.hide();
+                    },
+                },
+                {
+                    icon: 'comment',
+                    name: localize("acd.ta.controls.readAloudCurrentActor"),
+                    action: () => {
+                        const selection = this.getSelectionText();
+                        if (selection)
+                            this.readAloudCurrentActor(selection);
+                        this.contextMenu.hide();
+                    },
+                },
+            ],
+        });
+    }
+
     getSelectionText() {
         let html = '';
         const selection = window.getSelection();
@@ -331,7 +337,12 @@ export class ElevenlabsConnector {
     }
 
     readAloud(message, options = {}) {
-        message = `/talk {${this.tryGetSpeakerActorForNarratingActor()?._id}} ${message.replace(/\\n/g, '<br>')}`;
+
+        let narrator = options.narrator;
+        if ( !narrator) {
+            narrator = this.tryGetSpeakerActorForNarratingActor()?._id;
+        }
+        message = `/talk {${narrator}} ${message.replace(/\\n/g, '<br>')}`;
 
         ui.chat.processMessage(message);
     }
