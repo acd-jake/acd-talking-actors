@@ -9,7 +9,8 @@ export const MODULE = {
     APIKEY: "xi-api-key",
     MASTERAPIKEY: "xi-master-api-key",
     NARRATORACTOR: "narrating-actor",
-    ALLOWUSERS: "allow-users"
+    ALLOWUSERS: "allow-users",
+    ENABLESELECTIONCONTEXTMENU: "enableContextMenuOnSelection"
 }
 
 export const FLAGS = {

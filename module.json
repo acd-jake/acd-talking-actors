@@ -19,10 +19,14 @@
   }
   ],
   "styles": [
-    "styles/ta-styles.css"
+    "styles/ta-styles.css",
+    "styles/context-menu.min.css"
   ],
   "esmodules": [
     "scripts/init.js"
+  ],
+  "scripts": [
+    "scripts/context-menu.min.js"
   ],
   "packFolders": [
     {

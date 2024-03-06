@@ -2,44 +2,47 @@
     "acd.ta": {
         "settings": {
             "ApiKey": "API-Key",
-            "ApiKeyHint":"Your Elevenlabs API Key",
+            "ApiKeyHint": "Your Elevenlabs API Key",
             "MasterApiKey": "Master-API-Key",
-            "MasterApiKeyHint":"The Elevenlabs API Key to be used by all clients without their own API-Key. Leave empty when you don't want to share your Elevenlabs Account with your players.",
+            "MasterApiKeyHint": "The Elevenlabs API Key to be used by all clients without their own API-Key. Leave empty when you don't want to share your Elevenlabs Account with your players.",
             "NarratorActor": "Narrating Actor (ID)",
-            "NarratorActorHint":"This actor with this document id takes on the role of the narrator. This means that the voice settings of this actor are used if either no actor has been selected with the /talk command or no voice settings have been made for that actor.",
+            "NarratorActorHint": "This actor with this document id takes on the role of the narrator. This means that the voice settings of this actor are used if either no actor has been selected with the /talk command or no voice settings have been made for that actor.",
             "AllowUsers": "Allow users",
-			"AllowUsersHint": "If enabled, users have access to the module."
+            "AllowUsersHint": "If enabled, users have access to the module.",
+            "EnableSelectionContextMenu": "Enable Context Menu On Selected Text",
+            "EnableSelectionContextMenuHint": "If enabled, a context menu will be presented in journal entries to read aloud the selected text parts. (Not compatible with the module \"Narrator Tools\""
         },
         "controls": {
             "button.title": "Voice Settings",
-            "headerbutton.title": "Voice"
+            "headerbutton.title": "Voice",
+            "readAloud": "Read Aloud (Narrator)",
+            "readAloudCurrentActor": "Read Aloud (Actor)"
         },
         "VoiceSettings": {
-            "Title" : "Voice Settings for Actors",
-            "Actors" : "Actors",
-            "AddActor" : "Add an actor",
-            "Add" : "Add",
-            "ClearAll" : "Clear all actors",
-            "Clear" : "Clear",
+            "Title": "Voice Settings for Actors",
+            "Actors": "Actors",
+            "AddActor": "Add an actor",
+            "Add": "Add",
+            "ClearAll": "Clear all actors",
+            "Clear": "Clear",
             "DeleteActor": "Remove this actor",
             "VoiceLabel": "Voice",
-            "AcceptData" : "Accept",
-            "Close" : "Close",
-            "PlaySample" : "Play Sample",
-            "VoiceSelection" : "Voice Selection",
-            "Settings" : "Voice Settings",
-            "SimilarityBoost" : "Similarity Boost",
-            "Stability" : "Stability",
-            "Style" : "Style"
+            "AcceptData": "Accept",
+            "Close": "Close",
+            "PlaySample": "Play Sample",
+            "VoiceSelection": "Voice Selection",
+            "Settings": "Voice Settings",
+            "SimilarityBoost": "Similarity Boost",
+            "Stability": "Stability",
+            "Style": "Style"
         },
-        "errors":
-        {
-            "noTokenSelected" : "At least one token has to be selected.",
-            "noLinkedActor" : "At least one token with a linked actor has to be selected!",
+        "errors": {
+            "noTokenSelected": "At least one token has to be selected.",
+            "noLinkedActor": "At least one token with a linked actor has to be selected!",
             "notAllLinkedActors": "Not all selected token are linked to actors. Voice settings will only assigned to the linked actors.",
-            "noApiKey" : "The Elevenlabs api key has to be configured in the settings first.",
-            "unknownVoice" : "No Elevenlabs voice found.",
-            "tokensAlreadyAdded" : "Some actors are already contained and not added again."
+            "noApiKey": "The Elevenlabs api key has to be configured in the settings first.",
+            "unknownVoice": "No Elevenlabs voice found.",
+            "tokensAlreadyAdded": "Some actors are already contained and not added again."
         },
         "chat": {
             "textTalked": "Talked Text:",
