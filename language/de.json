@@ -2,44 +2,47 @@
     "acd.ta": {
         "settings": {
             "ApiKey": "API-Key",
-            "ApiKeyHint":"Dein API Key von Elevenlabs",
+            "ApiKeyHint": "Dein API Key von Elevenlabs",
             "MasterApiKey": "Haupt-API-Key",
-            "MasterApiKeyHint":"Der Elevenlabs API Key, der von allen Clients genutzt wird, für die kein eigener API Key angegeben wurde. Lasse ihn frei, wenn Du Deinen Elevenlabs Account nicht mit deinen Spielern teilen möchtest.",
+            "MasterApiKeyHint": "Der Elevenlabs API Key, der von allen Clients genutzt wird, für die kein eigener API Key angegeben wurde. Lasse ihn frei, wenn Du Deinen Elevenlabs Account nicht mit deinen Spielern teilen möchtest.",
             "NarratorActor": "Erzählender Akteur (ID)",
-            "NarratorActorHint":"Der Akteur mit diesem Dokument-Id übernimmt die Rolle des Erzählers. Das bedeutet, dass die Stimmeinstellungen dieses Akteurs benutzt werden, wenn entweder kein Akteur beim /talk Kommando ausgewählt wurde oder keine Stimmeinstellungen für diesen vorgenommen wurden.",
+            "NarratorActorHint": "Der Akteur mit diesem Dokument-Id übernimmt die Rolle des Erzählers. Das bedeutet, dass die Stimmeinstellungen dieses Akteurs benutzt werden, wenn entweder kein Akteur beim /talk Kommando ausgewählt wurde oder keine Stimmeinstellungen für diesen vorgenommen wurden.",
             "AllowUsers": "Benutzer erlaubt",
-			"AllowUsersHint": "Ist diese Option aktiv, haben Benutzer, die kein Spielleiter sind, Zugriff auf dieses Modul."
+            "AllowUsersHint": "Ist diese Option aktiv, haben Benutzer, die kein Spielleiter sind, Zugriff auf dieses Modul.",
+            "EnableSelectionContextMenu": "Aktiviere Kontextmenü für ausgewählten Text",
+            "EnableSelectionContextMenuHint": "Wenn diese Option aktiviert ist, wird in Journaleinträgen ein Kontextmenü angezeigt, um die ausgewählten Textteile vorzulesen. (Nicht kompatibel mit dem Modul \"Narrator Tools\")"
         },
         "controls": {
             "button.title": "Stimmeinstellungen",
-            "headerbutton.title": "Stimme"
+            "headerbutton.title": "Stimme",
+            "readAloud": "Laut lesen (Sprecher)",
+            "readAloudCurrentActor": "Laut lesen (Akteur)"
         },
         "VoiceSettings": {
-            "Title" : "Stimmeinstellungen für den Akteur",
-            "Actors" : "Akteure",
-            "AddActor" : "Akteur hinzufügen",
-            "Add" : "Hinzufügen",
-            "ClearAll" : "Alle Akteure entfernen",
-            "Clear" : "Alles entfernen",
+            "Title": "Stimmeinstellungen für den Akteur",
+            "Actors": "Akteure",
+            "AddActor": "Akteur hinzufügen",
+            "Add": "Hinzufügen",
+            "ClearAll": "Alle Akteure entfernen",
+            "Clear": "Alles entfernen",
             "DeleteActor": "Diesen Akteur entfernen",
             "VoiceLabel": "Stimme",
-            "AcceptData" : "Annehmen",
-            "Close" : "Schliessen",
-            "PlaySample" : "Beispiel abspielen",
-            "VoiceSelection" : "Stimmauswahl",
-            "Settings" : "Einstellungen für die Stimme",
-            "SimilarityBoost" : "Similarity Boost",
-            "Stability" : "Stability",
-            "Style" : "Style"
+            "AcceptData": "Annehmen",
+            "Close": "Schliessen",
+            "PlaySample": "Beispiel abspielen",
+            "VoiceSelection": "Stimmauswahl",
+            "Settings": "Einstellungen für die Stimme",
+            "SimilarityBoost": "Similarity Boost",
+            "Stability": "Stability",
+            "Style": "Style"
         },
-        "errors":
-        {
-            "noTokenSelected" : "Mindestens ein Token muss ausgewählt sein.",
-            "noLinkedActor" : "Mindestens ein Token mit einem verbundenen Akteur muss ausgewählt sein.",
+        "errors": {
+            "noTokenSelected": "Mindestens ein Token muss ausgewählt sein.",
+            "noLinkedActor": "Mindestens ein Token mit einem verbundenen Akteur muss ausgewählt sein.",
             "notAllLinkedActors": "Nicht alle ausgewählten Token sind mit Akteuren verbunden. Die Stimmeinstellungen werden nur für die verbundenen Akteure übernommen.",
-            "noApiKey" : "Der Api-Schlüssel von Elevenlabs muss zuerst in den Einstellungen konfiguriert werden.",
-            "unknownVoice" : "Keine Stimme von Elevenlabs gefunden.",
-            "tokensAlreadyAdded" : "Einige Akteure sind bereits enthalten und werden nicht neu hinzugefügt."
+            "noApiKey": "Der Api-Schlüssel von Elevenlabs muss zuerst in den Einstellungen konfiguriert werden.",
+            "unknownVoice": "Keine Stimme von Elevenlabs gefunden.",
+            "tokensAlreadyAdded": "Einige Akteure sind bereits enthalten und werden nicht neu hinzugefügt."
         },
         "chat": {
             "textTalked": "Gesprochener Text:",
