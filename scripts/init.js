@@ -2,6 +2,7 @@ import { ElevenlabsConnector } from './ElevenlabsConnector.js';
 import { MODULE } from './constants.js'
 import { VoiceSettingsApp } from './VoiceSettings.js';
 import { ReadAloudEnricher, ReadAloudActorEnricher, ReadAloudNarratorEnricher } from './ReadAloudEnricher.js';
+import { TalkingActorsApi } from './TalkingActorsApi.js';
 
 export let localize = key => {
     return game.i18n.localize(key);
@@ -66,7 +67,7 @@ function isModuleAccessible() {
 function openVoiceEditor(actors) {
     if (!actors || actors.length == 0) return;
 
-	new VoiceSettingsApp(actors).render(true);
+    new VoiceSettingsApp(actors).render(true);
 }
 
 
@@ -75,41 +76,41 @@ function injectActorSheetHeaderButton(sheet, buttons) {
         return;
     }
 
-	buttons.unshift({
-		class: 'edit-voicesetting',
-		icon: 'fas fa-comments',
-		label: localize("acd.ta.controls.headerbutton.title"),
-		onclick: _ => openVoiceEditor([sheet.document]),
-	});
+    buttons.unshift({
+        class: 'edit-voicesetting',
+        icon: 'fas fa-comments',
+        label: localize("acd.ta.controls.headerbutton.title"),
+        onclick: _ => openVoiceEditor([sheet.document]),
+    });
 }
 
 function injectActorDirectoryEntryContextButton([directory], entries) {
-	entries.push({
-		name: 'acd.ta.controls.button.title',
-		icon: '<i class="fas fa-comment"></i>',
-		condition: () => {
-			return isModuleAccessible();
-		},
-		callback: async ([entry]) => {
-			const directoryId = directory.id,
-				documentId = entry.dataset.documentId;
-			let actor;
+    entries.push({
+        name: 'acd.ta.controls.button.title',
+        icon: '<i class="fas fa-comment"></i>',
+        condition: () => {
+            return isModuleAccessible();
+        },
+        callback: async ([entry]) => {
+            const directoryId = directory.id,
+                documentId = entry.dataset.documentId;
+            let actor;
 
             if (directoryId === 'actors') {
-				actor = game.actors.get(documentId);
+                actor = game.actors.get(documentId);
             }
-			else {
+            else {
                 ui.notifications.warn('Only Actors are supported:', { directory, entry })
             }
-			
+
             if (actor) {
                 openVoiceEditor([actor]);
             }
-			else {
+            else {
                 ui.notifications.warn('Actor not found:', { documentId, directoryId })
             }
-		}
-	});
+        }
+    });
 }
 
 
@@ -124,6 +125,8 @@ Hooks.once("init", async function () {
     };
 
     await game.talkingactors.connector.initializeMain();
+
+    game.modules.get(MODULE.ID).api = new TalkingActorsApi();
     
     //add generic enrichers to TextEditor
     try {
@@ -178,14 +181,14 @@ Hooks.on("ready", () => {
     });
 
     if (game.settings.get(MODULE.ID, MODULE.ENABLESELECTIONCONTEXTMENU)) {
-    document.addEventListener('contextmenu', (ev) => {
-        if (ev.target.classList.contains('journal-entry-pages') ||
+        document.addEventListener('contextmenu', (ev) => {
+            if (ev.target.classList.contains('journal-entry-pages') ||
                 $(ev.target).parents('div.journal-entry-pages').length ||
                 ev.target.classList.contains('editor-content') ||
                 $(ev.target).parents('div.editor-content').length) {
-                    game.talkingactors.connector.showContextMenu(ev);
-                }
-    });
+                game.talkingactors.connector.showContextMenu(ev);
+            }
+        });
     }
 })
 
