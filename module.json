@@ -4,7 +4,7 @@
   "version": "#{VERSION}#",
   "compatibility": {
     "minimum": "11",
-    "verified": "11"
+    "verified": "12"
   },
   "languages": [
     {
@@ -61,6 +61,5 @@
   "url": "#{URL}#",
   "download": "#{DOWNLOAD}#",
   "manifest": "#{MANIFEST}#",
-  "bugs": "https://github.com/acd-jake/acd-talking-actors/issues",
-  "allowBugReporter": true
+  "bugs": "https://github.com/acd-jake/acd-talking-actors/issues"
 }
