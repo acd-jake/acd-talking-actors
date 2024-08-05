@@ -37,7 +37,7 @@ export class VoiceSettingsApp extends Application {
     }
 
     static get defaultOptions() {
-        return mergeObject(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             id: "changeVoiceSettings",
             title: localize("acd.ta.VoiceSettings.Title"),
             template: MODULE.TEMPLATEDIR + "ta-voice-settings.hbs",

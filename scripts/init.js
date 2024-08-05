@@ -95,7 +95,7 @@ function injectActorSheetHeaderButton(sheet, buttons) {
     });
 }
 
-function injectActorDirectoryEntryContextButton([directory], entries) {
+function injectActorDirectoryEntryContextButton(application, entries) {
     entries.push({
         name: 'acd.ta.controls.button.title',
         icon: '<i class="fas fa-comment"></i>',
@@ -103,11 +103,10 @@ function injectActorDirectoryEntryContextButton([directory], entries) {
             return isModuleAccessible();
         },
         callback: async ([entry]) => {
-            const directoryId = directory.id,
-                documentId = entry.dataset.documentId;
+            const documentId = entry.dataset.documentId;
             let actor;
 
-            if (directoryId === 'actors') {
+            if (application.id === 'actors') {
                 actor = game.actors.get(documentId);
             }
             else {
