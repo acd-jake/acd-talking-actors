@@ -10,7 +10,9 @@
             "AllowUsers": "Benutzer erlaubt",
             "AllowUsersHint": "Ist diese Option aktiv, haben Benutzer, die kein Spielleiter sind, Zugriff auf dieses Modul.",
             "EnableSelectionContextMenu": "Aktiviere Kontextmenü für ausgewählten Text",
-            "EnableSelectionContextMenuHint": "Wenn diese Option aktiviert ist, wird in Journaleinträgen ein Kontextmenü angezeigt, um die ausgewählten Textteile vorzulesen. (Nicht kompatibel mit dem Modul \"Narrator Tools\")"
+            "EnableSelectionContextMenuHint": "Wenn diese Option aktiviert ist, wird in Journaleinträgen ein Kontextmenü angezeigt, um die ausgewählten Textteile vorzulesen. (Nicht kompatibel mit dem Modul \"Narrator Tools\")",
+            "PostTextToChat": "Schicke den gesprochenen Text in den Chat",
+            "PostTextToChatHint": "Wenn diese Option aktiviert ist, wird der gesprochene Text in das Chatwindow geschrieben (und möglicherweise als Sprechblase über dem Token des Akteurs angezeigt)."
         },
         "controls": {
             "button.title": "Stimmeinstellungen",

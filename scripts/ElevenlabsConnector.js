@@ -29,11 +29,21 @@ export class ElevenlabsConnector {
             || (game.settings.get(MODULE.ID, MODULE.MASTERAPIKEY)?.length > 1);
     }
 
-    processChatMessage(chatlog, messageText, chatData) {
+    processChatMessage(chatlog, messageText, chatData, postToChat = true) {
         const talkCommand = "talk";
+
+        const talkSilentCommand = "talk-s";
+
         let messageData = messageText.match(`^/(${talkCommand}) ((.|[\r\n])*)$`);
 
-        if (!messageData || messageData[1] != talkCommand) {
+        if (!messageData) {
+            messageData = messageText.match(`^/(${talkSilentCommand}) ((.|[\r\n])*)$`);
+            postToChat=false;
+        }
+
+        if (!messageData 
+            || (messageData[1] != talkCommand 
+                && messageData[1] != talkSilentCommand)) {
             // no chat command or wrong chat command found. Return for further processing
             return true;
         }
@@ -111,7 +121,12 @@ export class ElevenlabsConnector {
         console.log(voice_id)
 
         if (voice_id) {
-            let chatMessagePromise = this.postToChat(chatData, `${localize("acd.ta.chat.textTalked")}`, `<span class="acd-ta-talked">${messageText}</span>`);
+            let chatMessagePromise;
+            
+            if ( postToChat && game.settings.get(MODULE.ID, MODULE.POSTTOCHAT ) ) {
+                 chatMessagePromise = this.postToChat(chatData, `${localize("acd.ta.chat.textTalked")}`, `<span class="acd-ta-talked">${messageText}</span>`);
+            }
+
             this.textToSpeech(voice_id, messageText, settings, chatlog, chatMessagePromise);
         } else {
             ui.notifications.error(localize("acd.ta.errors.unknownVoice"));
@@ -192,7 +207,7 @@ export class ElevenlabsConnector {
             flavor: flavor,
             user: chatData.user,
             speaker: chatData.speaker,
-            type: CONST.CHAT_MESSAGE_TYPES.OOC,
+            type: CONST.CHAT_MESSAGE_STYLES.OOC,
             content: messageText,
         };
         return ChatMessage.create(messageData, { chatBubble: true });
@@ -221,10 +236,11 @@ export class ElevenlabsConnector {
         let history_item_id = await new GetLastHistoryItemRequest().fetch();
         this.playSound(chunks, history_item_id);
 
-
-        let chatMessage = await chatMessagePromise;
-        await this.updateChatMessageFlavor(history_item_id, chatMessage, { showPlay: true });
-        chatlog.updateMessage(chatMessage)
+        if ( chatMessagePromise ) {
+            let chatMessage = await chatMessagePromise;
+            await this.updateChatMessageFlavor(history_item_id, chatMessage, { showPlay: true });
+            chatlog.updateMessage(chatMessage)
+        }
     }
 
     async updateChatMessageFlavor(history_item_id, chatMessage, options = {}) {
@@ -269,7 +285,7 @@ export class ElevenlabsConnector {
     }
 
     async playAudio(url) {
-        return AudioHelper.play({ src: url, volume: 1.0, loop: false }, false);
+        return foundry.audio.AudioHelper.play({ src: url, volume: 1.0, loop: false }, false);
     }
 
     async playSample(voiceId) {

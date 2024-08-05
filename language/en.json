@@ -10,7 +10,9 @@
             "AllowUsers": "Allow users",
             "AllowUsersHint": "If enabled, users have access to the module.",
             "EnableSelectionContextMenu": "Enable Context Menu On Selected Text",
-            "EnableSelectionContextMenuHint": "If enabled, a context menu will be presented in journal entries to read aloud the selected text parts. (Not compatible with the module \"Narrator Tools\""
+            "EnableSelectionContextMenuHint": "If enabled, a context menu will be presented in journal entries to read aloud the selected text parts. (Not compatible with the module \"Narrator Tools\"",
+            "PostTextToChat": "Post spoken text to chat",
+            "PostTextToChatHint": "If enabled, the spoken text will be posted to the chat window (and possibly as a chat bubble on the actor's token)"
         },
         "controls": {
             "button.title": "Voice Settings",

@@ -10,7 +10,8 @@ export const MODULE = {
     MASTERAPIKEY: "xi-master-api-key",
     NARRATORACTOR: "narrating-actor",
     ALLOWUSERS: "allow-users",
-    ENABLESELECTIONCONTEXTMENU: "enableContextMenuOnSelection"
+    ENABLESELECTIONCONTEXTMENU: "enableContextMenuOnSelection",
+    POSTTOCHAT: "postSpokenTextToChat"
 }
 
 export const FLAGS = {
