@@ -204,7 +204,55 @@ Hooks.on("ready", () => {
             }
         });
     }
+
+    Hooks.on("renderTokenHUD", (app, hudHtml, data) => {
+        if ( !app.object.document.actorLink ) {
+            return;
+        }
+        
+        let button = $(`<div class="control-icon talkingactors" data-tooltip="${localize("acd.ta.TokenHud.dialog.title")}"><i class="fas fa-comments"></i></div>`);
+        let actor = game.actors.get(app.object.document.actorId);
+
+        hudHtml.find(".col.left").append(button);
+        button.find("i.fa-comments").click(async (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const myContent = await renderTemplate(MODULE.TEMPLATEDIR + "ta-tokenhud-dialog.hbs", data);
+            
+            new Dialog({
+              title: game.i18n.localize("acd.ta.TokenHud.dialog.title"),
+              content: myContent,
+              buttons: {
+                readaloud:  {
+                    icon: '<i class="fas fa-comments"></i>',
+                    label: localize("acd.ta.TokenHud.withChat"),
+                    callback: (html) => readAloudCallback(html, true)
+                },
+                readAloudWithoutChat:  {
+                    icon: '<i class="fas fa-comments"></i>',
+                    label: localize("acd.ta.TokenHud.withoutChat"),
+                    callback: (html) => readAloudCallback(html, false)
+                },
+                cancel: {
+                  icon: '<i class="fas fa-cancel"></i>',
+                  label: game.i18n.localize("Cancel"),
+                },
+              },
+              default: "cancel",
+            }).render(true);
+          });
+      });
 })
+
+function readAloudCallback(html, postToChat) {
+    let message = html.find("[name='readaloadtext']").first().val();
+    let speaker = html.find("input[name='speaker']:checked").val();
+    if (speaker == "narrator") {
+        game.talkingactors.connector.readAloud(message,postToChat);
+    } else {
+        game.talkingactors.connector.readAloudCurrentActor(message,postToChat);
+    }
+}
 
 Handlebars.registerHelper('ifEquals', function (arg1, arg2, options) {
     return (arg1 == arg2) ? options.fn(this) : options.inverse(this);

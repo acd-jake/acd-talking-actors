@@ -17,8 +17,8 @@
         "controls": {
             "button.title": "Stimmeinstellungen",
             "headerbutton.title": "Stimme",
-            "readAloud": "Vorlesen (Sprecher)",
-            "readAloudWithoutChat": "Vorlesen (Sprecher)\r\nohne Chatnachricht",
+            "readAloud": "Vorlesen (Erzähler)",
+            "readAloudWithoutChat": "Vorlesen (Erzähler)\r\nohne Chatnachricht",
             "readAloudCurrentActor": "Vorlesen (Akteur)",
             "readAloudCurrentActorWithoutChat": "Vorlesen (Akteur) ohne Chatnachricht",
             "cancel": "Abbrechen"
@@ -40,6 +40,15 @@
             "SimilarityBoost": "Similarity Boost",
             "Stability": "Stability",
             "Style": "Style"
+        },
+        "TokenHud": {
+            "dialog.title": "Text vorlesen",
+            "text.label": "Text der vorgelesen werden soll",
+            "speaker": "Sprecher",
+            "narrator": "Erzähler",
+            "actor": "Akteur",
+            "withChat": "Vorlesen",
+            "withoutChat": "Vorlesen <b>ohne</b> Chatnachricht"
         },
         "errors": {
             "noTokenSelected": "Mindestens ein Token muss ausgewählt sein.",

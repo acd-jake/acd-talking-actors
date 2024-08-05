@@ -41,6 +41,15 @@
             "Stability": "Stability",
             "Style": "Style"
         },
+        "TokenHud": {
+            "dialog.title": "Read Text Aloud",
+            "text.label": "Read aloud this text",
+            "speaker": "Speaker",
+            "narrator": "Narrator",
+            "actor": "Actor",
+            "withChat": "Read Aloud",
+            "withoutChat": "Read Aloud <b>Without</b> Chatmessage"
+        },
         "errors": {
             "noTokenSelected": "At least one token has to be selected.",
             "noLinkedActor": "At least one token with a linked actor has to be selected!",
