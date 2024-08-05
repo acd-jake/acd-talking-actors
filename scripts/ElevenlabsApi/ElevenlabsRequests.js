@@ -1,6 +1,6 @@
 import { MODULE } from '../constants.js';
 
-class ElevenlabsRequest {
+export class ElevenlabsRequest {
     api_key;
     api_url = 'https://api.elevenlabs.io/v1/';
 
@@ -50,95 +50,4 @@ class ElevenlabsRequest {
     }
 }
 
-export class TextToSpeechRequest extends ElevenlabsRequest {
-    voiceId;
-    text;
-    settings;
 
-    constructor(voiceId, text, settings) {
-        super();
-        this.voiceId = voiceId;
-        this.text = text;
-        this.settings = settings;
-    }
-
-    async fetch() {
-        let body = {
-            "text": this.text,
-            "model_id": "eleven_multilingual_v2"
-        };
-
-        if (this.settings) {
-            body = foundry.utils.mergeObject(body, {
-                "voice_settings": {
-                    "stability": this.settings.stability,
-                    "similarity_boost": this.settings.similarity_boost,
-                    "style": this.settings.style,
-                    "use_speaker_boost": "true"
-                }
-            });
-        }
-
-        let response = await this.postData(`text-to-speech/${this.voiceId}`,
-            "audio/mpeg", JSON.stringify(body));
-        return response;
-    }
-}
-
-export class ReplaySpeechRequest extends ElevenlabsRequest {
-    itemId;
-
-    constructor (itemId) {
-        super();
-        this.itemId = itemId;
-    }
-
-    async fetch() {
-        return await super.fetchResponse(`history/${this.itemId}/audio`, {});
-    }
-}
-
-export class GetLastHistoryItemRequest extends ElevenlabsRequest {
-    async fetch () {
-        let response = await super.fetchJson('history?page_size=1')
-            .then(text => JSON.parse(text));
-        return response.last_history_item_id;
-    }
-}
-
-export class GetVoicesRequest extends ElevenlabsRequest {
-    async fetch() {
-        let allVoices;
-
-        allVoices = await super.fetchJson('voices')
-            .then(text => JSON.parse(text).voices);
-
-        return allVoices;
-    }
-}
-
-export class GetUserDataRequest extends ElevenlabsRequest {
-    async fetch() {
-        let subscriptionInfo = await super.fetchJson('user/subscription')
-            .then(text => JSON.parse(text));
-
-        return subscriptionInfo;
-    }
-}
-
-export class GetVoiceSettingsRequest extends ElevenlabsRequest {
-    voiceId;
-
-    constructor(voiceId) {
-        super();
-        this.voiceId = voiceId;
-    }
-
-    async fetch() {
-        let settings = await super.fetchJson(`voices/${this.voiceId}/settings`)
-            .then(text => JSON.parse(text));
-
-        return settings;
-
-    }
-}

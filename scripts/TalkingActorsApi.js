@@ -10,7 +10,7 @@ export class TalkingActorsApi {
     }
 
     tryGetStandardSpeakerActor(chatData) {
-        return this.tryGetStandardSpeakerActor(chatData);
+        return game.talkingactors.connector.tryGetStandardSpeakerActor(chatData);
     }
 
     getVoiceIdAndSettingsFromActor(speakerActor) {

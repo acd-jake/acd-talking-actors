@@ -1,6 +1,10 @@
 import { MODULE, FLAGS } from './constants.js';
 import { localize } from './init.js';
-import { GetUserDataRequest, GetVoicesRequest, GetVoiceSettingsRequest, TextToSpeechRequest, GetLastHistoryItemRequest, ReplaySpeechRequest } from './ElevenlabsApi/ElevenlabsRequests.js';
+
+import { GetUserSubscriptionInfoRequest } from './ElevenlabsApi/UserRequests.js';
+import { GetVoiceSettingsRequest, GetVoicesRequest } from './ElevenlabsApi/VoicesRequests.js';
+import { TextToSpeechRequest } from './ElevenlabsApi/TextToSpeechRequests.js';
+import { GetAudioFromHistoryItemRequest, GetLastHistoryItemRequest } from './ElevenlabsApi/HistoryRequests.js';
 
 export class ElevenlabsConnector {
     subscriptionInfo;
@@ -217,7 +221,7 @@ export class ElevenlabsConnector {
     }
 
     async getUserdata() {
-        this.subscriptionInfo = await new GetUserDataRequest()
+        this.subscriptionInfo = await new GetUserSubscriptionInfoRequest()
             .fetch();
     }
 
@@ -279,7 +283,7 @@ export class ElevenlabsConnector {
     }
 
     async replaySpeech(itemId) {
-        let container = await new ReplaySpeechRequest(itemId).fetch();
+        let container = await new GetAudioFromHistoryItemRequest(itemId).fetch();
 
         let chunks = await this.readChunks(container);
         game.socket.emit('module.' + MODULE.ID, { testarg: "Hello World", container: chunks })
