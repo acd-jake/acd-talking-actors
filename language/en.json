@@ -18,7 +18,10 @@
             "button.title": "Voice Settings",
             "headerbutton.title": "Voice",
             "readAloud": "Read Aloud (Narrator)",
-            "readAloudCurrentActor": "Read Aloud (Actor)"
+            "readAloudWithoutChat": "Read Aloud (Narrator) without Chatmessage",
+            "readAloudCurrentActor": "Read Aloud (Actor)",
+            "readAloudCurrentActorWithoutChat": "Read Aloud (Actor) without Chatmessage",
+            "cancel": "Cancel"
         },
         "VoiceSettings": {
             "Title": "Voice Settings for Actors",

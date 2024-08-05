@@ -38,7 +38,6 @@ export class ElevenlabsConnector {
 
         if (!messageData) {
             messageData = messageText.match(`^/(${talkSilentCommand}) ((.|[\r\n])*)$`);
-            postToChat=false;
         }
 
         if (!messageData 
@@ -46,6 +45,11 @@ export class ElevenlabsConnector {
                 && messageData[1] != talkSilentCommand)) {
             // no chat command or wrong chat command found. Return for further processing
             return true;
+        }
+
+        if (messageData[1] == talkSilentCommand)
+        {
+            postToChat=false;
         }
 
         messageText = messageData[2];
@@ -168,7 +172,6 @@ export class ElevenlabsConnector {
         }
         return actor;
     }
-
 
     tryGetSpeakerActorAndChatDataForConversationHud(chatData) {
         let actor;
@@ -314,7 +317,17 @@ export class ElevenlabsConnector {
                     action: () => {
                         const selection = this.getSelectionText();
                         if (selection)
-                            this.readAloud(selection);
+                            this.readAloud(selection,true);
+                        this.contextMenu.hide();
+                    },
+                },
+                {
+                    icon: 'comment',
+                    name: localize("acd.ta.controls.readAloudWithoutChat"),
+                    action: () => {
+                        const selection = this.getSelectionText();
+                        if (selection)
+                            this.readAloud(selection,false);
                         this.contextMenu.hide();
                     },
                 },
@@ -324,7 +337,24 @@ export class ElevenlabsConnector {
                     action: () => {
                         const selection = this.getSelectionText();
                         if (selection)
-                            this.readAloudCurrentActor(selection);
+                            this.readAloudCurrentActor(selection,true);
+                        this.contextMenu.hide();
+                    },
+                },
+                {
+                    icon: 'comment',
+                    name: localize("acd.ta.controls.readAloudCurrentActorWithoutChat"),
+                    action: () => {
+                        const selection = this.getSelectionText();
+                        if (selection)
+                            this.readAloudCurrentActor(selection,false);
+                        this.contextMenu.hide();
+                    },
+                },
+                {
+                    icon: 'cancel',
+                    name: localize("acd.ta.controls.cancel"),
+                    action: () => {
                         this.contextMenu.hide();
                     },
                 },
@@ -350,19 +380,31 @@ export class ElevenlabsConnector {
         return html;
     }
 
-    readAloud(message, options = {}) {
+    readAloud(message, postToChat = true, options = {}) {
 
         let narrator = options.narrator;
         if ( !narrator) {
             narrator = this.tryGetSpeakerActorForNarratingActor()?._id;
         }
-        message = `/talk {${narrator}} ${message.replace(/\\n/g, '<br>')}`;
+
+        let command = this.createChatCommand(postToChat);
+        message = `/${command} {${narrator}} ${message.replace(/\\n/g, '<br>')}`;
 
         ui.chat.processMessage(message);
     }
 
-    readAloudCurrentActor(message, options = {}) {
-        message = `/talk ${message.replace(/\\n/g, '<br>')}`;
+    createChatCommand(postToChat) {
+        if (postToChat) {
+            return "talk";
+        } else {
+            return "talk-s";
+        }
+    }
+
+    readAloudCurrentActor(message, postToChat = true, options = {}) {
+        let command = this.createChatCommand(postToChat);
+
+        message = `/${command} ${message.replace(/\\n/g, '<br>')}`;
 
         ui.chat.processMessage(message);
     }
