@@ -1,6 +1,7 @@
 import { ElevenlabsConnector } from './ElevenlabsConnector.js';
 import { MODULE } from './constants.js'
 import { VoiceSettingsApp } from './VoiceSettings.js';
+import { ReadAloudEnricher, ReadAloudActorEnricher, ReadAloudNarratorEnricher } from './ReadAloudEnricher.js';
 
 export let localize = key => {
     return game.i18n.localize(key);
@@ -123,6 +124,20 @@ Hooks.once("init", async function () {
     };
 
     await game.talkingactors.connector.initializeMain();
+    
+    //add generic enrichers to TextEditor
+    try {
+        CONFIG.TextEditor.enrichers.push(
+            new ReadAloudEnricher(),
+            new ReadAloudActorEnricher(),
+            new ReadAloudNarratorEnricher()
+        );
+
+    } catch (error) {
+        console.error("LMJE | Failed to initialize generic enrichers\n", error);
+    }
+    loadTemplates([MODULE.TEMPLATEDIR + 'ta-readaloud-table.hbs']);
+
 });
 
 Hooks.on("getSceneControlButtons", (controls, b, c) => {
