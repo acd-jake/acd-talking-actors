@@ -17,8 +17,11 @@
         "controls": {
             "button.title": "Stimmeinstellungen",
             "headerbutton.title": "Stimme",
-            "readAloud": "Laut lesen (Sprecher)",
-            "readAloudCurrentActor": "Laut lesen (Akteur)"
+            "readAloud": "Vorlesen (Sprecher)",
+            "readAloudWithoutChat": "Vorlesen (Sprecher)\r\nohne Chatnachricht",
+            "readAloudCurrentActor": "Vorlesen (Akteur)",
+            "readAloudCurrentActorWithoutChat": "Vorlesen (Akteur) ohne Chatnachricht",
+            "cancel": "Abbrechen"
         },
         "VoiceSettings": {
             "Title": "Stimmeinstellungen für den Akteur",
