@@ -2,8 +2,6 @@ import { MODULE, FLAGS } from './constants.js';
 import { localize } from './init.js';
 import { GetUserDataRequest, GetVoicesRequest, GetVoiceSettingsRequest, TextToSpeechRequest, GetLastHistoryItemRequest, ReplaySpeechRequest } from './ElevenlabsApi/ElevenlabsRequests.js';
 
-
-
 export class ElevenlabsConnector {
     subscriptionInfo;
     allVoices;
