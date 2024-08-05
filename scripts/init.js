@@ -55,6 +55,17 @@ function registerSettings() {
         type: Boolean,
         default: false,
     });
+
+    
+    game.settings.register(MODULE.ID, MODULE.POSTTOCHAT, {
+        name: 'acd.ta.settings.PostTextToChat',
+        hint: 'acd.ta.settings.PostTextToChatHint',
+        config: true,
+        scope: 'world',
+        type: Boolean,
+        default: true,
+    });
+
 }
 
 function isModuleAccessible() {

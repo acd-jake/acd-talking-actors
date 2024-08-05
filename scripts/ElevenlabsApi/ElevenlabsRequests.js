@@ -69,7 +69,7 @@ export class TextToSpeechRequest extends ElevenlabsRequest {
         };
 
         if (this.settings) {
-            body = mergeObject(body, {
+            body = foundry.utils.mergeObject(body, {
                 "voice_settings": {
                     "stability": this.settings.stability,
                     "similarity_boost": this.settings.similarity_boost,
