@@ -154,7 +154,10 @@ Hooks.once("init", async function () {
 });
 
 Hooks.on("getSceneControlButtons", (controls, b, c) => {
-    if (!isModuleAccessible()) {
+    // Button in token controls is not needed anymore since Talking Actor Voice Settings UI is now  accessible
+    // via context menu in actor tab and in header of the character sheets
+
+    /*    if (!isModuleAccessible()) {
         return;
     }
 
@@ -175,6 +178,7 @@ Hooks.on("getSceneControlButtons", (controls, b, c) => {
             },
             button: true,
         });
+*/
 });
 
 
