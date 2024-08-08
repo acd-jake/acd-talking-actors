@@ -1,72 +1,12 @@
 import { ElevenlabsConnector } from './ElevenlabsConnector.js';
 import { MODULE } from './constants.js'
-import { VoiceSettingsApp } from './VoiceSettings.js';
+import { VoiceSettingsApp } from './apps/VoiceSettingsApp.js';
 import { ReadAloudEnricher, ReadAloudActorEnricher, ReadAloudNarratorEnricher } from './ReadAloudEnricher.js';
 import { TalkingActorsApi } from './TalkingActorsApi.js';
-
-export let localize = key => {
-    return game.i18n.localize(key);
-};
-
-
-function registerSettings() {
-    game.settings.register(MODULE.ID, MODULE.MASTERAPIKEY, {
-        name: localize("acd.ta.settings.MasterApiKey"),
-        hint: localize("acd.ta.settings.MasterApiKeyHint"),
-        scope: "world",
-        config: true,
-        type: String,
-        onChange: value => { game.talkingactors.connector.initializeMain(); },
-        requiresReload: true
-    });
-
-    game.settings.register(MODULE.ID, MODULE.APIKEY, {
-        name: localize("acd.ta.settings.ApiKey"),
-        hint: localize("acd.ta.settings.ApiKeyHint"),
-        scope: "client",
-        config: true,
-        type: String,
-        onChange: value => { game.talkingactors.connector.initializeMain(); }
-    });
-
-    game.settings.register(MODULE.ID, MODULE.NARRATORACTOR, {
-        name: localize("acd.ta.settings.NarratorActor"),
-        hint: localize("acd.ta.settings.NarratorActorHint"),
-        scope: "world",
-        config: true,
-        type: String,
-        onChange: value => { game.talkingactors.connector.initializeMain(); }
-    });
-
-    game.settings.register(MODULE.ID, MODULE.ALLOWUSERS, {
-        name: 'acd.ta.settings.AllowUsers',
-        hint: 'acd.ta.settings.AllowUsersHint',
-        config: true,
-        scope: 'world',
-        type: Boolean,
-        default: true,
-    });
-
-    game.settings.register(MODULE.ID, MODULE.ENABLESELECTIONCONTEXTMENU, {
-        name: 'acd.ta.settings.EnableSelectionContextMenu',
-        hint: 'acd.ta.settings.EnableSelectionContextMenuHint',
-        config: true,
-        scope: 'world',
-        type: Boolean,
-        default: false,
-    });
-
-    
-    game.settings.register(MODULE.ID, MODULE.POSTTOCHAT, {
-        name: 'acd.ta.settings.PostTextToChat',
-        hint: 'acd.ta.settings.PostTextToChatHint',
-        config: true,
-        scope: 'world',
-        type: Boolean,
-        default: true,
-    });
-
-}
+import { localize, loadScript } from './functions.js';
+import { registerSettings } from './settings.js';
+import { GenerateSoundEffectsApp } from './apps/GenerateSoundEffectsApp.js';
+import { Mp3Utils } from './Mp3Utils.js';
 
 function isModuleAccessible() {
     let moduleAccessible = false;
@@ -123,12 +63,11 @@ function injectActorDirectoryEntryContextButton(application, entries) {
     });
 }
 
-
-
 Hooks.once("init", async function () {
 
     registerSettings();
 
+    Mp3Utils.init();
 
     game.talkingactors = {
         connector: new ElevenlabsConnector()
@@ -137,7 +76,7 @@ Hooks.once("init", async function () {
     await game.talkingactors.connector.initializeMain();
 
     game.modules.get(MODULE.ID).api = new TalkingActorsApi();
-    
+
     //add generic enrichers to TextEditor
     try {
         CONFIG.TextEditor.enrichers.push(
@@ -205,11 +144,18 @@ Hooks.on("ready", () => {
         });
     }
 
+    if (game.user.isGM) {
+        hookOnRenderTokenHUD();
+        hookOnChangeSidebarTab();
+    }
+})
+
+function hookOnRenderTokenHUD() {
     Hooks.on("renderTokenHUD", (app, hudHtml, data) => {
-        if ( !app.object.document.actorLink ) {
+        if (!app.object.document.actorLink) {
             return;
         }
-        
+
         let button = $(`<div class="control-icon talkingactors" data-tooltip="${localize("acd.ta.TokenHud.dialog.title")}"><i class="fas fa-comments"></i></div>`);
         let actor = game.actors.get(app.object.document.actorId);
 
@@ -217,40 +163,71 @@ Hooks.on("ready", () => {
         button.find("i.fa-comments").click(async (event) => {
             event.preventDefault();
             event.stopPropagation();
-            const myContent = await renderTemplate(MODULE.TEMPLATEDIR + "ta-tokenhud-dialog.hbs", data);
-            
-            new Dialog({
-              title: game.i18n.localize("acd.ta.TokenHud.dialog.title"),
-              content: myContent,
-              buttons: {
-                readaloud:  {
-                    icon: '<i class="fas fa-comments"></i>',
-                    label: localize("acd.ta.TokenHud.withChat"),
-                    callback: (html) => readAloudCallback(html, true)
-                },
-                readAloudWithoutChat:  {
-                    icon: '<i class="fas fa-comments"></i>',
-                    label: localize("acd.ta.TokenHud.withoutChat"),
-                    callback: (html) => readAloudCallback(html, false)
-                },
-                cancel: {
-                  icon: '<i class="fas fa-cancel"></i>',
-                  label: game.i18n.localize("Cancel"),
-                },
-              },
-              default: "cancel",
-            }).render(true);
-          });
-      });
-})
+            await showTokenHudReadAloudDialog(event, data);
+        });
+    });
+}
+
+async function showTokenHudReadAloudDialog(event, data) {
+    const myContent = await renderTemplate(MODULE.TEMPLATEDIR + "ta-tokenhud-dialog.hbs", data);
+
+    new Dialog({
+        title: game.i18n.localize("acd.ta.TokenHud.dialog.title"),
+        content: myContent,
+        buttons: {
+            readaloud: {
+                icon: '<i class="fas fa-comments"></i>',
+                label: localize("acd.ta.TokenHud.withChat"),
+                callback: (html) => readAloudCallback(html, true)
+            },
+            readAloudWithoutChat: {
+                icon: '<i class="fas fa-comments"></i>',
+                label: localize("acd.ta.TokenHud.withoutChat"),
+                callback: (html) => readAloudCallback(html, false)
+            },
+            close: {
+                icon: '<i class="fas fa-cancel"></i>',
+                label: game.i18n.localize("Cancel"),
+            },
+        },
+        default: "close",
+    }).render(true);
+}
+
+function hookOnChangeSidebarTab() {
+    Hooks.on("changeSidebarTab", (app) => {
+        if (!(app instanceof PlaylistDirectory)) {
+            return;
+        }
+
+        if ($('#ta-create-soundeffect').length == 0) {
+            injectCreateSoundEffectButton(app);
+        }
+    });
+}
+
+function injectCreateSoundEffectButton(app) {
+    $('#playlists').find('footer.directory-footer').append(
+        `<a class="ta-create-soundeffect" id="ta-create-soundeffect" data-tooltip="${localize("acd.ta.SoundEffects.createbuttonHint")}">` +
+        game.i18n.localize('acd.ta.SoundEffects.createbutton') +
+        '</a>'
+    );
+
+    $('#ta-create-soundeffect').click(async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        new GenerateSoundEffectsApp(app).render(true);
+    });
+}
 
 function readAloudCallback(html, postToChat) {
     let message = html.find("[name='readaloadtext']").first().val();
     let speaker = html.find("input[name='speaker']:checked").val();
     if (speaker == "narrator") {
-        game.talkingactors.connector.readAloud(message,postToChat);
+        game.talkingactors.connector.readAloud(message, postToChat);
     } else {
-        game.talkingactors.connector.readAloudCurrentActor(message,postToChat);
+        game.talkingactors.connector.readAloudCurrentActor(message, postToChat);
     }
 }
 

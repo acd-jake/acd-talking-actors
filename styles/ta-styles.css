@@ -111,11 +111,36 @@
     justify-content: flex-end;
 }
 
-#changeVoiceSettings .settings-header {
+#changeVoiceSettings .settings-header, .ta-se-generation .settings-header {
     border-radius: 4px;
     color: #fff;
     background: rgba(0, 0, 0, 0.5);
     box-shadow: 0 0 10px #000;
     border: 1px solid #000;
     padding: 1px 8px;
+}
+
+#ta-create-soundeffect {
+    text-align: center;
+    width: 100%;
+    display: block;
+}
+
+.ta-se-generation {
+    position: relative;
+}
+
+.ta-se-overlay {
+    position: absolute;
+    width: 100%;
+    background: #e0e0e0a0;
+    display: none;
+}
+
+.ta-se-overlay-text {
+    left: 50%;
+    top: 50%;
+    position: absolute;
+    font-size: x-large;
+    font-weight: bold;
 }

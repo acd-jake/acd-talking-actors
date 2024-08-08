@@ -12,7 +12,11 @@
             "EnableSelectionContextMenu": "Aktiviere Kontextmenü für ausgewählten Text",
             "EnableSelectionContextMenuHint": "Wenn diese Option aktiviert ist, wird in Journaleinträgen ein Kontextmenü angezeigt, um die ausgewählten Textteile vorzulesen. (Nicht kompatibel mit dem Modul \"Narrator Tools\")",
             "PostTextToChat": "Schicke den gesprochenen Text in den Chat",
-            "PostTextToChatHint": "Wenn diese Option aktiviert ist, wird der gesprochene Text in das Chatwindow geschrieben (und möglicherweise als Sprechblase über dem Token des Akteurs angezeigt)."
+            "PostTextToChatHint": "Wenn diese Option aktiviert ist, wird der gesprochene Text in das Chatwindow geschrieben (und möglicherweise als Sprechblase über dem Token des Akteurs angezeigt).",
+            "SoundEffectFolder": "Ordner für Soundeffekte",
+            "SoundEffectFolderHint": "In diesem Ordner werden die Dateien der erzeugten Soundeffekte abgelegt.",
+            "SoundEffectPlaylist": "Playliste für Soundeffekte",
+            "SoundEffectPlaylistHint": "Der Name der Playliste, in der die generierten Soundeffekte abgelegt werden."
         },
         "controls": {
             "button.title": "Stimmeinstellungen",
@@ -49,6 +53,30 @@
             "actor": "Akteur",
             "withChat": "Vorlesen",
             "withoutChat": "Vorlesen <b>ohne</b> Chatnachricht"
+        },
+        "SoundEffects": {
+            "dialog.title": "Soundeffekte erzeugen",
+            "createbutton": "Soundeffekte erzeugen",
+            "createbuttonHint": "Neue Soundeffekte erzeugen",
+            "effectDescription": "Beschreibung des Effekts",
+            "effectDescriptionHint": "Der Text, der in einen Soundeffekt umgewandelt werden soll (auf Englisch).",
+            "generationSettings": "Einstellungen für die Generation",
+            "secondsLabel": "Dauer",
+            "secondsUnit": "Sekunde(n)",
+            "automatic": "automatisch",
+            "promptInfluenceLabel": "Einfluss der Beschreibung",
+            "filename": "Name des Effekts",
+            "buttonGenerate": "Erzeugen",
+            "buttonGenerateHint": "Erzeugt den Soundeffekt und speichert ihn in der Playlist",
+            "buttonGenerateAndPlace": "Erzeugen und Platzieren",
+            "buttonGenerateAndPlaceHint": "Erzeugt den Soundeffekt, speichert ihn in der Playlist und platziert ihn als Umgebungsgeräusch in der Szene.",
+            "headerAmbientSoundOptions": "Umgebungsgeräusch-Optionen",
+            "radius": "Effekt-Radius",
+            "volume": "Maximale Lautstärke",
+            "repeat": "Wiederholen",
+            "walls": "Durch Wände begrenzt",
+            "easing": "Lautstärke anpassen",
+            "hidden": "Versteckt"
         },
         "errors": {
             "noTokenSelected": "Mindestens ein Token muss ausgewählt sein.",
