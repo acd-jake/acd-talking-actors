@@ -1,10 +1,11 @@
 import { MODULE, FLAGS } from './constants.js';
-import { localize } from './init.js';
+import { isModuleActive, localize } from './functions.js';
 
 import { GetUserSubscriptionInfoRequest } from './ElevenlabsApi/UserRequests.js';
 import { GetVoiceSettingsRequest, GetVoicesRequest } from './ElevenlabsApi/VoicesRequests.js';
 import { TextToSpeechRequest } from './ElevenlabsApi/TextToSpeechRequests.js';
 import { GetAudioFromHistoryItemRequest, GetLastHistoryItemRequest } from './ElevenlabsApi/HistoryRequests.js';
+import { SoundGenerationRequest } from './ElevenlabsApi/SoundGenerationRequest.js';
 
 export class ElevenlabsConnector {
     subscriptionInfo;
@@ -44,16 +45,15 @@ export class ElevenlabsConnector {
             messageData = messageText.match(`^/(${talkSilentCommand}) ((.|[\r\n])*)$`);
         }
 
-        if (!messageData 
-            || (messageData[1] != talkCommand 
+        if (!messageData
+            || (messageData[1] != talkCommand
                 && messageData[1] != talkSilentCommand)) {
             // no chat command or wrong chat command found. Return for further processing
             return true;
         }
 
-        if (messageData[1] == talkSilentCommand)
-        {
-            postToChat=false;
+        if (messageData[1] == talkSilentCommand) {
+            postToChat = false;
         }
 
         messageText = messageData[2];
@@ -130,9 +130,9 @@ export class ElevenlabsConnector {
 
         if (voice_id) {
             let chatMessagePromise;
-            
-            if ( postToChat && game.settings.get(MODULE.ID, MODULE.POSTTOCHAT ) ) {
-                 chatMessagePromise = this.postToChat(chatData, `${localize("acd.ta.chat.textTalked")}`, `<span class="acd-ta-talked">${messageText}</span>`);
+
+            if (postToChat && game.settings.get(MODULE.ID, MODULE.POSTTOCHAT)) {
+                chatMessagePromise = this.postToChat(chatData, `${localize("acd.ta.chat.textTalked")}`, `<span class="acd-ta-talked">${messageText}</span>`);
             }
 
             this.textToSpeech(voice_id, messageText, settings, chatlog, chatMessagePromise);
@@ -162,8 +162,8 @@ export class ElevenlabsConnector {
 
     tryGetSpeakerActorAndChatDataForSceneActors(chatData) {
         let actor;
-        let modulename = "yendors-scene-actors";
-        if (this.isModuleActive(modulename)
+        let modulename = MODULE.DEPENDENCY_SCENEACTORS;
+        if (isModuleActive(modulename)
             && game.yendorsSceneActors.show
             && game.yendorsSceneActors.actorFocusId != null) {
             actor = game.yendorsSceneActors.actorsDetail.find((t) => t._id == game.yendorsSceneActors.actorFocusId);
@@ -179,8 +179,8 @@ export class ElevenlabsConnector {
 
     tryGetSpeakerActorAndChatDataForConversationHud(chatData) {
         let actor;
-        let modulename = "conversation-hud";
-        if (this.isModuleActive(modulename)
+        let modulename = MODULE.DEPENDENCY_CONVERSATIONHUD;
+        if (isModuleActive(modulename)
             && game.ConversationHud.conversationIsSpeakingAs == true
             && game.ConversationHud.activeConversation
             && game.ConversationHud.activeConversation.activeParticipant != -1) {
@@ -202,11 +202,6 @@ export class ElevenlabsConnector {
             settings = moduleFlags ? moduleFlags[FLAGS.VOICE_SETTINGS] : undefined;
         }
         return { voice_id, settings };
-    }
-
-    isModuleActive(modulename) {
-        return game.modules.get(modulename)
-            && game.modules.get(modulename).active;
     }
 
     postToChat(chatData, flavor, messageText) {
@@ -243,12 +238,24 @@ export class ElevenlabsConnector {
         let history_item_id = await new GetLastHistoryItemRequest().fetch();
         this.playSound(chunks, history_item_id);
 
-        if ( chatMessagePromise ) {
+        if (chatMessagePromise) {
             let chatMessage = await chatMessagePromise;
             await this.updateChatMessageFlavor(history_item_id, chatMessage, { showPlay: true });
             chatlog.updateMessage(chatMessage)
         }
     }
+
+    async generateSoundEffect(text, settings, filename) {
+        let response = await new SoundGenerationRequest(text, settings).fetch();
+
+        if (!response.ok) {
+            console.error(`Error: ${response.statusText}`);
+            return;
+        }
+
+        return response;
+    }
+
 
     async updateChatMessageFlavor(history_item_id, chatMessage, options = {}) {
         let newflavor = `${localize("acd.ta.chat.textTalked")}`;
@@ -321,7 +328,7 @@ export class ElevenlabsConnector {
                     action: () => {
                         const selection = this.getSelectionText();
                         if (selection)
-                            this.readAloud(selection,true);
+                            this.readAloud(selection, true);
                         this.contextMenu.hide();
                     },
                 },
@@ -331,7 +338,7 @@ export class ElevenlabsConnector {
                     action: () => {
                         const selection = this.getSelectionText();
                         if (selection)
-                            this.readAloud(selection,false);
+                            this.readAloud(selection, false);
                         this.contextMenu.hide();
                     },
                 },
@@ -341,7 +348,7 @@ export class ElevenlabsConnector {
                     action: () => {
                         const selection = this.getSelectionText();
                         if (selection)
-                            this.readAloudCurrentActor(selection,true);
+                            this.readAloudCurrentActor(selection, true);
                         this.contextMenu.hide();
                     },
                 },
@@ -351,7 +358,7 @@ export class ElevenlabsConnector {
                     action: () => {
                         const selection = this.getSelectionText();
                         if (selection)
-                            this.readAloudCurrentActor(selection,false);
+                            this.readAloudCurrentActor(selection, false);
                         this.contextMenu.hide();
                     },
                 },
@@ -387,7 +394,7 @@ export class ElevenlabsConnector {
     readAloud(message, postToChat = true, options = {}) {
 
         let narrator = options.narrator;
-        if ( !narrator) {
+        if (!narrator) {
             narrator = this.tryGetSpeakerActorForNarratingActor()?._id;
         }
 

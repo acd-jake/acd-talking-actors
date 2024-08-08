@@ -1,5 +1,5 @@
 import { MODULE, FLAGS } from '../constants.js';
-import { localize } from '../init.js';
+import { localize } from '../functions.js';
 
 export class VoiceSettingsApp extends Application {
 

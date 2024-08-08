@@ -11,7 +11,12 @@ export const MODULE = {
     NARRATORACTOR: "narrating-actor",
     ALLOWUSERS: "allow-users",
     ENABLESELECTIONCONTEXTMENU: "enableContextMenuOnSelection",
-    POSTTOCHAT: "postSpokenTextToChat"
+    POSTTOCHAT: "postSpokenTextToChat",
+    SOUNDEFFECTFOLDER: "posteffectfolder",
+    SOUNDEFFECTPLAYLIST: "soundeffectPlaylistName",
+    DEPENDENCY_PORTALLIB: "portal-lib",
+    DEPENDENCY_SCENEACTORS: "yendors-scene-actors",
+    DEPENDENCY_CONVERSATIONHUD: "conversation-hud"
 }
 
 export const FLAGS = {
