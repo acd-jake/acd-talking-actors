@@ -10,3 +10,7 @@ An Elevenlabs subscription is required for the module to work. https://beta.elev
 * This module optionally uses the [Conversation Hud](https://foundryvtt.com/packages/conversation-hud) module if this is installed. If the "Speak As" option is set in the Conversation Hud module, the active conversation participant is used for the voice output and does not need to have a token in the active scene. (From version 0.5)
 * Supports read-aloud texts in FoundryVTT journals with an insertable macro (with free voice selection by voice id, actor name or actor id). (From version 0.6)
 * Offers the option of playing spoken text repeatedly by clicking a button on the chat messages. The replayed text will be loaded from the history of generated samples in Elevenlabs and thus does not count against the word limit. (From version 0.6)
+* Supports entering of text to be read aloud with a button in the token hud (from version 0.8)
+* Offers the option to suppres posting the spoken text to the chat (from version 0.8)
+* Provides an api to be used by third party modules (from version 0.8)
+* Supports generation of sound effects based on textual description from the playlist sidebar (from version 0.8)
