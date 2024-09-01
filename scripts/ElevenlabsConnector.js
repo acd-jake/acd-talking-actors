@@ -205,11 +205,19 @@ export class ElevenlabsConnector {
     }
 
     postToChat(chatData, flavor, messageText) {
+        // Ensure compatibility to Foundry prior generation 12
+        let chatMessageType;
+        if (game.data.release.generation < 12){
+            chatMessageType = CONST.CHAT_MESSAGE_TYPES.OOC;
+        } else {
+            chatMessageType = CONST.CHAT_MESSAGE_STYLES.OOC;
+        }
+
         let messageData = {
             flavor: flavor,
             user: chatData.user,
             speaker: chatData.speaker,
-            type: CONST.CHAT_MESSAGE_STYLES.OOC,
+            type: chatMessageType,
             content: messageText,
         };
         return ChatMessage.create(messageData, { chatBubble: true });
