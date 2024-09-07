@@ -207,7 +207,7 @@ export class ElevenlabsConnector {
     postToChat(chatData, flavor, messageText) {
         // Ensure compatibility to Foundry prior generation 12
         let chatMessageType;
-        if (game.data.release.generation < 12){
+        if (game.data.release.generation < 12) {
             chatMessageType = CONST.CHAT_MESSAGE_TYPES.OOC;
         } else {
             chatMessageType = CONST.CHAT_MESSAGE_STYLES.OOC;
@@ -307,7 +307,11 @@ export class ElevenlabsConnector {
     }
 
     async playAudio(url) {
-        return foundry.audio.AudioHelper.play({ src: url, volume: 1.0, loop: false }, false);
+        if (game.data.release.generation < 12) {
+            return AudioHelper.play({ src: url, volume: 1.0, loop: false }, false);
+        } else {
+            return foundry.audio.AudioHelper.play({ src: url, volume: 1.0, loop: false }, false);
+        }
     }
 
     async playSample(voiceId) {
