@@ -251,12 +251,25 @@ class ACDTalkingActors {
     }
     async readAloudCurrentActor(content, postToChat = true, options = {}) {
         // Implementation for reading aloud content with the current actor's voice
+        let command = this.createChatCommand(postToChat);
 
+        content = `/${command} ${content.replace(/\\n/g, '<br>')}`;
+
+        ui.chat.processMessage(content);
     }
 
     async readAloud(content, postToChat = true, options = {}) {
         // Implementation for reading aloud content with the given actors voice
-    }
+        let narrator = options.narrator;
+        if (!narrator) {
+            narrator = this.tryGetSpeakerActorForNarratingActor()?._id;
+        }
+
+        let command = this.createChatCommand(postToChat);
+        content = `/${command} {${narrator}} ${content.replace(/\\n/g, '<br>')}`;
+
+        ui.chat.processMessage(content);
+   }
 
     async readAloudCallback(html, postToChat) {
         let message = html.find("[name='readaloadtext']").first().val();
@@ -268,6 +281,9 @@ class ACDTalkingActors {
         }
     }
 
+    createChatCommand(postToChat) {
+        return postToChat ? "talk" : "talk-s";
+    }
 }
 
 /* Expose the constructor for other modules/dev tools if desired */
