@@ -1,4 +1,4 @@
-import { ElevenlabsRequest } from "./ElevenlabsRequests.js";
+import { ElevenlabsRequest } from "./elevenlabs-request.js";
 
 
 export class GetUserSubscriptionInfoRequest extends ElevenlabsRequest {
@@ -9,3 +9,4 @@ export class GetUserSubscriptionInfoRequest extends ElevenlabsRequest {
         return subscriptionInfo;
     }
 }
+

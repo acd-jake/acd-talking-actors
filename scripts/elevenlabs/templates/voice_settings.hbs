@@ -67,8 +67,35 @@
                             <i class="fas fa-play" style="margin-left: 10px"></i></a>
                     </div>
 
-                    <div class="settings-header">{{localize 'acd.ta.VoiceSettings.Settings'}}</div>
+                    <div class="settings-header">{{localize 'acd.ta.VoiceSettings.Model'}}</div>
                     
+                    <!-- Model Selection -->
+                    <div class="form-group">
+                        <label>{{localize 'acd.ta.VoiceSettings.ModelLabel'}}</label>
+                        <select id="model-id">
+                            {{#each models}}
+                            <option value="{{this.model_id}}" {{#ifEquals this.model_id ../modelId}}selected="selected"
+                                {{/ifEquals}}>{{this.name}}</option>
+                            {{/each}}
+                        </select>   
+                    </div>
+
+
+                    <!-- Language Selection -->
+                    <div class="form-group">
+                        <label>{{localize 'acd.ta.VoiceSettings.Language'}}</label>
+                        <select id="language-id">
+                            {{#each currentModel.languages}}
+                            <option value="{{this.language_id}}" {{#ifEquals this.language_id ../languageId}}selected="selected"
+                                {{/ifEquals}}>{{this.name}}</option>
+                            {{/each}}
+                            
+                        </select>
+
+                    </div>  
+
+                    <div class="settings-header">{{localize 'acd.ta.VoiceSettings.Settings'}}</div>
+
                     <!-- Similarity Boost -->
                     <div class="form-group">
                         <label>{{localize 'acd.ta.VoiceSettings.SimilarityBoost'}}</label>

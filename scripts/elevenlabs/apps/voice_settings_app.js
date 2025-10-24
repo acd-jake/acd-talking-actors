@@ -1,32 +1,91 @@
-import { MODULE, FLAGS } from '../constants.js';
-import { localize } from '../functions.js';
+// /c:/Users/mheil/AppData/Local/FoundryVTT/Data/modules/acd-talking-actors/scripts/elevenlabs/apps/voice_settings_app.js
+//
+// A lightweight Foundry Application to edit voice / TTS settings for an Actor or a Token.
+// Stores settings as a flag on the Actor or the Token document under the module key:
+//   module: "acd-talking-actors", flag: "voiceSettings"
+//
+// Usage:
+//   // for an Actor document
+//   new VoiceSettingsApp({ actor: actor }).render(true);
+//   // for a Token or TokenDocument
+//   new VoiceSettingsApp({ token: token }).render(true);
+
+import { ELEVENLABS_CONSTANTS, ELEVENLABS_FLAGS } from "../constants.js";
 
 export class VoiceSettingsApp extends Application {
 
-    constructor(actors, options = {}) {
+    static flag = "elevenlabs-voiceSettings";
+    static moduleKey = "acd-talking-actors";
+
+    constructor(actors, availableVoices, models, options = {}) {
         super(options);
 
         this.opts = options;
         this.actors = actors;
-        this.voices = game.talkingactors.connector.allVoices;
+        this.voices = availableVoices;
         this.voiceId = this.getCurrentVoiceId();
         this.voiceSettings = this.getCurrentVoiceSettings();
+        this.models = models;
+        this.modelId = this.getCurrentVoiceModelId() || "";
+        this.currentModel = this.getCurrentVoiceModel();
+        this.languageId = this.getCurrentLanguageId() || "";
     }
 
     getCurrentVoiceId() {
         if (this.actors.length == 0)
             return undefined;
 
-        let voice_id = this.actors[0].flags[MODULE.ID] ? this.actors[0].flags[MODULE.ID][FLAGS.VOICE_ID] : undefined;
+        // Safely read nested flags using optional chaining and computed property access
+        let voice_id = this.actors[0].flags?.[VoiceSettingsApp.moduleKey]?.[ELEVENLABS_FLAGS.VOICE_ID];
 
         return voice_id;
+    }
+
+    getCurrentVoiceModelId() {
+        if (this.actors.length == 0)
+            return undefined;
+
+        // Safely read nested flags using optional chaining and computed property access
+        let voice_model_id = this.actors[0].flags?.[VoiceSettingsApp.moduleKey]?.[ELEVENLABS_FLAGS.VOICE_MODEL_ID];
+        
+        return voice_model_id;
+    }
+
+    getCurrentVoiceModel() {
+        if (this.actors.length == 0)
+            return undefined;
+
+        let voice_model_id = this.getCurrentVoiceModelId();
+
+        let currentModel = this.models.find(m => m.model_id === voice_model_id);
+        return currentModel;
+    }
+
+    getCurrentLanguageId() {
+        if (this.actors.length == 0)
+            return undefined;
+
+        let currentModel = this.getCurrentVoiceModel();
+
+        if (!currentModel) return "";
+
+        // Safely read nested flags using optional chaining and computed property access
+        let language_id = this.actors[0].flags?.[VoiceSettingsApp.moduleKey]?.[ELEVENLABS_FLAGS.LANGUAGE_ID];
+        
+        let foundLanguage = currentModel.languages.find(l => l.language_id === language_id);
+        
+        if (foundLanguage && foundLanguage.language_id) {
+            return foundLanguage.language_id;
+        }
+        
+        return currentModel.languages[0]?.language_id || "";
     }
 
     getCurrentVoiceSettings() {
         if (this.actors.length == 0)
             return {};
 
-        let settings = this.actors[0].flags[MODULE.ID] ? this.actors[0].flags[MODULE.ID][FLAGS.VOICE_SETTINGS] : {};
+        let settings = this.actors[0].flags?.[VoiceSettingsApp.moduleKey]?.[ELEVENLABS_FLAGS.VOICE_SETTINGS];
         if (settings == undefined) {
             settings = {};
             if (this.voiceId != undefined) {
@@ -39,8 +98,8 @@ export class VoiceSettingsApp extends Application {
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             id: "changeVoiceSettings",
-            title: localize("acd.ta.VoiceSettings.Title"),
-            template: MODULE.TEMPLATEDIR + "ta-voice-settings.hbs",
+            title: game.i18n.localize("acd.ta.VoiceSettings.Title"),
+            template: ELEVENLABS_CONSTANTS.TEMPLATEDIR + "voice_settings.hbs",
             width: 800,
             popOut: true
         });
@@ -53,7 +112,11 @@ export class VoiceSettingsApp extends Application {
         return {
             actors: this.actors,
             voices: this.voices,
+            models: this.models,
             voiceId: this.getCurrentVoiceId(),
+            modelId: this.getCurrentVoiceModelId() || "",
+            currentModel: this.getCurrentVoiceModel() || {},
+            languageId: this.getCurrentLanguageId() || "",
             voiceSettings: currentSettings,
             currentStability: currentSettings.stability ? Math.round(currentSettings.stability*100) : 0,
             currentSimilarityBoost: currentSettings.similarity_boost ? Math.round(currentSettings.similarity_boost*100) : 0,
@@ -81,6 +144,15 @@ export class VoiceSettingsApp extends Application {
             await that.updateVoiceSettings();
         }, this));
 
+        $('#model-id', html).change($.proxy(async function (e) {
+            that.modelId = $(e.currentTarget).val();
+            that.currentModel = that.models.find(m => m.model_id === that.modelId);
+        }, this));
+
+        $('#language-id', html).change($.proxy(async function (e) {
+            that.languageId = $(e.currentTarget).val();
+        }, this));
+
         $('#similarity_boost', html).change($.proxy(async function (e) {
             that.voiceSettings.similarity_boost = $(e.currentTarget).val();
             that.setTextValue($('.ta-voice-settings #similarity_boost_label'), this.voiceSettings.similarity_boost);
@@ -106,13 +178,13 @@ export class VoiceSettingsApp extends Application {
 
     async updateVoiceSettings() {
 
-        let settings = this.actors[0].flags[MODULE.ID] ? this.actors[0].flags[MODULE.ID][FLAGS.VOICE_SETTINGS] : {};
+        let settings = this.actors[0].flags?.[VoiceSettingsApp.moduleKey]?.[ELEVENLABS_FLAGS.VOICE_SETTINGS];
 
         if (settings != undefined && this.voiceId == this.getCurrentVoiceId) {
             this.voiceSettings = settings;
         }
         else if (this.voiceId != undefined) {
-            this.voiceSettings = await game.talkingactors.connector.getVoiceSettings(this.voiceId);
+            this.voiceSettings = await game.acdTalkingActors.ttsConnector.getVoiceSettings(this.voiceId);
         }
 
         $('.ta-voice-settings #similarity_boost').val(this.voiceSettings.similarity_boost);
@@ -125,14 +197,16 @@ export class VoiceSettingsApp extends Application {
 
     async acceptData() {
         for (let actor of this.actors) {
-            await actor.setFlag(MODULE.ID, FLAGS.VOICE_ID, this.voiceId);
-            await actor.setFlag(MODULE.ID, FLAGS.VOICE_SETTINGS, this.voiceSettings);
+            await actor.setFlag(VoiceSettingsApp.moduleKey, ELEVENLABS_FLAGS.VOICE_ID, this.voiceId);
+            await actor.setFlag(VoiceSettingsApp.moduleKey, ELEVENLABS_FLAGS.VOICE_MODEL_ID, this.modelId);
+            await actor.setFlag(VoiceSettingsApp.moduleKey, ELEVENLABS_FLAGS.LANGUAGE_ID, this.languageId);
+            await actor.setFlag(VoiceSettingsApp.moduleKey, ELEVENLABS_FLAGS.VOICE_SETTINGS, this.voiceSettings);
         }
         this.close();
     }
 
     async playSample() {
-        game.talkingactors.connector.playSample($('#voice-id').find(":selected").val());
+        game.acdTalkingActors.ttsConnector.playSample($('#voice-id').find(":selected").val());
     }
 
     changeActors(e) {
@@ -186,3 +260,8 @@ export class VoiceSettingsApp extends Application {
         window.setTimeout(() => { this.setPosition({ height: 'auto' }); }, 100);
     }
 }
+
+// Expose to global so other modules/scripts can open it easily
+window.VoiceSettingsApp = VoiceSettingsApp;
+
+

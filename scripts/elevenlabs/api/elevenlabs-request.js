@@ -1,13 +1,13 @@
-import { MODULE } from '../constants.js';
+import { ELEVENLABS_CONSTANTS } from "../constants.js";
 
 export class ElevenlabsRequest {
     api_key;
     api_url = 'https://api.elevenlabs.io/v1/';
 
     constructor() {
-        this.api_key = game.settings.get(MODULE.ID, MODULE.APIKEY);
-        if (this.api_key?.length <1) {
-            this.api_key = game.settings.get(MODULE.ID, MODULE.MASTERAPIKEY);
+        this.api_key = game.settings.get(ELEVENLABS_CONSTANTS.ID, ELEVENLABS_CONSTANTS.APIKEY);
+        if (this.api_key?.length < 1) {
+            this.api_key = game.settings.get(ELEVENLABS_CONSTANTS.ID, ELEVENLABS_CONSTANTS.MASTERAPIKEY);
         }
     }
 
@@ -34,7 +34,7 @@ export class ElevenlabsRequest {
                 'accept': 'application/json',
                 'xi-api-key': this.api_key
             }
-        })
+        });
     }
     async postData(command, acceptType, body) {
         let response = await fetch(`${this.api_url}${command}`, {
@@ -49,5 +49,4 @@ export class ElevenlabsRequest {
         return response;
     }
 }
-
 

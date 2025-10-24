@@ -1,10 +1,11 @@
-import { loadScript } from "./functions.js";
+import { loadScript } from "../../libs/functions.js";
+import Logger from "../../libs/logger.js";
 
 export class Mp3Utils {
-
+    static logger = new Logger(Mp3Utils);
     static init() {
         loadScript('https://cdn.jsdelivr.net/npm/mp3tag.js@latest/dist/mp3tag.min.js', () => {
-            console.log('mp3tag loaded');
+            Mp3Utils.logger.info('mp3tag loaded');
         });
     }
 
@@ -20,7 +21,7 @@ export class Mp3Utils {
                 buffer = Mp3Utils.saveTags(mp3tag, buffer);
             }
         } catch (error) {
-            console.error('Error adding mp3 tags:', error);
+            Mp3Utils.logger.error('Error adding mp3 tags:', error);
         } finally {
             return buffer;
         }
@@ -30,7 +31,7 @@ export class Mp3Utils {
         mp3tag.save();
 
         if (mp3tag.error) {
-            console.error('Error saving MP3 tags:', mp3tag.error);
+            Mp3Utils.logger.error('Error saving MP3 tags:', mp3tag.error);
             return buffer;
         }
         return mp3tag.buffer;
@@ -40,7 +41,7 @@ export class Mp3Utils {
         mp3tag.read();
 
         if (mp3tag.error !== '') {
-            console.error('Error reading MP3 tags:', mp3tag.error);
+            Mp3Utils.logger.error('Error reading MP3 tags:', mp3tag.error);
             return false;
         }
         return true;
@@ -58,10 +59,10 @@ export class Mp3Utils {
 
         try {
             const response = await FilePicker.upload("data", dir, file, {}, { notify: true });
-            console.log("File upload response:", response);
+            Mp3Utils.logger.info("File upload response:", response);
             ui.notifications.info(`File saved: ${path}`);
         } catch (err) {
-            console.error("Error saving file:", err);
+            Mp3Utils.logger.error("Error saving file:", err);
             ui.notifications.error(`Failed to save file: ${path}`);
         }
     }

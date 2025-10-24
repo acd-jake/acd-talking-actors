@@ -1,14 +1,17 @@
-import { ElevenlabsRequest } from "./ElevenlabsRequests.js";
-
+import { ElevenlabsRequest } from "./elevenlabs-request.js";
 
 export class TextToSpeechRequest extends ElevenlabsRequest {
     voiceId;
+    modelId;
+    languageId;
     text;
     settings;
 
-    constructor(voiceId, text, settings) {
+    constructor(voiceId, modelId, languageId, text, settings) {
         super();
         this.voiceId = voiceId;
+        this.modelId = modelId;
+        this.languageId = languageId;
         this.text = text;
         this.settings = settings;
     }
@@ -16,7 +19,8 @@ export class TextToSpeechRequest extends ElevenlabsRequest {
     async fetch() {
         let body = {
             "text": this.text,
-            "model_id": "eleven_multilingual_v2"
+            "model_id": this.modelId, // "eleven_multilingual_v2"
+            "language_code": this.languageId  //"en"
         };
 
         if (this.settings) {
@@ -35,4 +39,5 @@ export class TextToSpeechRequest extends ElevenlabsRequest {
         return response;
     }
 }
+
 

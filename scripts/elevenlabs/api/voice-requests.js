@@ -1,4 +1,4 @@
-import { ElevenlabsRequest } from "./ElevenlabsRequests.js";
+import { ElevenlabsRequest } from "./elevenlabs-request.js";
 
 
 export class GetVoicesRequest extends ElevenlabsRequest {
@@ -28,3 +28,4 @@ export class GetVoiceSettingsRequest extends ElevenlabsRequest {
 
     }
 }
+

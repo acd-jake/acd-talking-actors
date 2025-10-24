@@ -13,6 +13,8 @@
             "EnableSelectionContextMenuHint": "If enabled, a context menu will be presented in journal entries to read aloud the selected text parts. (Not compatible with the module \"Narrator Tools\"",
             "PostTextToChat": "Post spoken text to chat",
             "PostTextToChatHint": "If enabled, the spoken text will be posted to the chat window (and possibly as a chat bubble on the actor's token)",
+            "AutoInCharacterTalk": "Automatically read aloud In-Character chat messages",
+            "AutoInCharacterTalkHint": "If enabled, chat messages sent In-Character with the /ic command will be automatically read aloud.",
             "SoundEffectFolder": "Folder for Sound Effects",
             "SoundEffectFolderHint": "The files for the generated sound effects will be stored in this folder.",
             "SoundEffectPlaylist": "Playlist for sound effects",

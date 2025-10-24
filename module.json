@@ -3,8 +3,8 @@
   "title": "Talking Actors",
   "version": "#{VERSION}#",
   "compatibility": {
-    "minimum": "11",
-    "verified": "12"
+    "minimum": "13",
+    "verified": "13"
   },
   "languages": [
     {
@@ -19,14 +19,13 @@
   }
   ],
   "styles": [
-    "styles/ta-styles.css",
     "styles/context-menu.min.css"
   ],
   "esmodules": [
-    "scripts/init.js"
+    "scripts/main.js"
   ],
   "scripts": [
-    "scripts/context-menu.min.js"
+    "scripts/libs/context-menu.min.js"
   ],
   "packFolders": [
     {

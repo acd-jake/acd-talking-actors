@@ -13,6 +13,8 @@
             "EnableSelectionContextMenuHint": "Wenn diese Option aktiviert ist, wird in Journaleinträgen ein Kontextmenü angezeigt, um die ausgewählten Textteile vorzulesen. (Nicht kompatibel mit dem Modul \"Narrator Tools\")",
             "PostTextToChat": "Schicke den gesprochenen Text in den Chat",
             "PostTextToChatHint": "Wenn diese Option aktiviert ist, wird der gesprochene Text in das Chatwindow geschrieben (und möglicherweise als Sprechblase über dem Token des Akteurs angezeigt).",
+            "AutoInCharacterTalk": "In-Character Chatnachrichten automatisch vorlesen",
+            "AutoInCharacterTalkHint": "Wenn diese Option aktiviert ist, werden Chatnachrichten, die mit dem /ic-Befehl In-Character gesendet werden, automatisch vorgelesen.",
             "SoundEffectFolder": "Ordner für Soundeffekte",
             "SoundEffectFolderHint": "In diesem Ordner werden die Dateien der erzeugten Soundeffekte abgelegt.",
             "SoundEffectPlaylist": "Playliste für Soundeffekte",

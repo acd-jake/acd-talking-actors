@@ -1,18 +1,16 @@
-import { MODULE } from '../constants.js';
-import { localize, isModuleActive } from '../functions.js';
-import { Mp3Utils } from '../Mp3Utils.js';
-
+import { ELEVENLABS_CONSTANTS, ELEVENLABS_FLAGS } from "../constants.js";
+import { isModuleActive } from "../../libs/functions.js";
+import { Mp3Utils } from "../libs/mp3-utils.js";
+import { SoundGenerationRequest } from "../api/sound-generation-request.js";
 
 export class GenerateSoundEffectsApp extends Application {
     text;
-    playlistApp;
     durationSeconds;
     promptInfluence;
 
-    constructor(playlistApp, options = {}) {
+    constructor(options = {}) {
         super(options);
 
-        this.playlistApp = playlistApp;
         this.durationSeconds = 0;
         this.promptInfluence = 0.3;
     }
@@ -20,8 +18,8 @@ export class GenerateSoundEffectsApp extends Application {
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             id: "generateSoundEffects",
-            title: localize("acd.ta.SoundEffects.dialog.title"),
-            template: MODULE.TEMPLATEDIR + "ta-create-soundeffects-dialog.hbs",
+            title: game.i18n.localize("acd.ta.SoundEffects.dialog.title"),
+            template: ELEVENLABS_CONSTANTS.TEMPLATEDIR + "create_soundeffects_dialog.hbs",
             width: 1000,
             popOut: true,
             resizable: true,
@@ -35,7 +33,7 @@ export class GenerateSoundEffectsApp extends Application {
         return {
             text: this.text,
             durationSeconds: this.durationSeconds,
-            currentSeconds: localize ('acd.ta.SoundEffects.automatic'),
+            currentSeconds: game.i18n.localize('acd.ta.SoundEffects.automatic'),
             promptInfluence: this.promptInfluence,
             currentPromptInfluence: this.promptInfluence,
             filename: this.filename
@@ -53,9 +51,9 @@ export class GenerateSoundEffectsApp extends Application {
         $('#ta_sf_duration_seconds', html).change($.proxy(async function (e) {
             that.durationSeconds = $(e.currentTarget).val();
             if (that.durationSeconds == 0) {
-                that.setTextValue($('#ta_sf_duration_seconds_label'), localize ('acd.ta.SoundEffects.automatic'));
+                that.setTextValue($('#ta_sf_duration_seconds_label'), game.i18n.localize('acd.ta.SoundEffects.automatic'));
             } else {
-                that.setTextValue($('#ta_sf_duration_seconds_label'), that.durationSeconds + "  " + localize ('acd.ta.SoundEffects.secondsUnit'));
+                that.setTextValue($('#ta_sf_duration_seconds_label'), that.durationSeconds + "  " + game.i18n.localize('acd.ta.SoundEffects.secondsUnit'));
             }
         }, this));
 
@@ -74,7 +72,6 @@ export class GenerateSoundEffectsApp extends Application {
         $('.dialog-button.close', html).click(this.close.bind(this));
 
         // $('#ta_sf_generate', html).click(this.generateEffect.bind(this));
-
     }
 
     async acceptData() {
@@ -91,12 +88,26 @@ export class GenerateSoundEffectsApp extends Application {
     }
 
     async generateEffectInternal() {
-        let response = await game.talkingactors.connector.generateSoundEffect(this.text, { durationSeconds: this.durationSeconds, promptInfluence: this.promptInfluence }, this.filename);
+        const savePath = game.settings.get(ELEVENLABS_CONSTANTS.ID, ELEVENLABS_CONSTANTS.SOUNDEFFECTFOLDER);
 
-        const savePath = game.settings.get(MODULE.ID, MODULE.SOUNDEFFECTFOLDER);
-
-        const filenameWithExtension = this.convertToValidFilename(this.filename) + ".mp3";
+        const randomSuffix = Math.random().toString(36).slice(2);
+        const filenameWithExtension = this.convertToValidFilename(this.filename) + "_" + randomSuffix + ".mp3";
         const effectFilenameWithPath = `${savePath}/${filenameWithExtension}`;
+
+        let response;
+        try {
+            response = await this.generateSoundEffect(this.text, { durationSeconds: this.durationSeconds, promptInfluence: this.promptInfluence });
+        } catch (error) {
+            ui.notifications.error("Failed to generate sound effect: " + error.message);
+            console.error("Sound effect generation error:", error);
+            return;
+        }
+
+        if (!response || typeof response.blob !== "function") {
+            ui.notifications.error("Invalid response received from sound effect API.");
+            console.error("Invalid response:", response);
+            return;
+        }
 
         // Read the response as a blob and convert to ArrayBuffer for manipulation
         let buffer = await (await response.blob()).arrayBuffer();
@@ -105,17 +116,17 @@ export class GenerateSoundEffectsApp extends Application {
 
         Mp3Utils.saveFile(new Uint8Array(mp3Buffer), effectFilenameWithPath);
 
-        const playListName = game.settings.get(MODULE.ID, MODULE.SOUNDEFFECTPLAYLIST);
+        const playListName = game.settings.get(ELEVENLABS_CONSTANTS.ID, ELEVENLABS_CONSTANTS.SOUNDEFFECTPLAYLIST);
 
-        if (!this.playlistApp.documents.find(doc => doc.name == playListName)) {
+        if (!game.playlists.find(t=> t.name ===playListName)) {
             await Playlist.create({ name: playListName, channel: "environment", mode: -1 });
         }
 
-        let playlist = this.playlistApp.documents.find(doc => doc.name == playListName);
+        let playlist = game.playlists.find(t=> t.name ===playListName);
 
         let playlistSound = new PlaylistSound({ name: this.filename, description: this.text, path: effectFilenameWithPath, channel: "environment" });
 
-        await playlist.createEmbeddedDocuments("PlaylistSound", [playlistSound])
+        await playlist.createEmbeddedDocuments("PlaylistSound", [playlistSound]);
 
         ui.notifications.info(`Sound ${playlistSound.name} added to playlist ${playlist.name}`);
 
@@ -124,17 +135,28 @@ export class GenerateSoundEffectsApp extends Application {
         return playlistSound;
     }
 
+        async generateSoundEffect(text, settings = {}) {
+        let response = await new SoundGenerationRequest(text, settings).fetch();
+
+        if (!response.ok) {
+            console.error(`Error: ${response.statusText}`);
+            return;
+        }
+
+        return response;
+    }
+
     async generateEffect() {
         this.showOverlay();
-       
+
         await this.generateEffectInternal();
-       
+
         this.hideOverlay();
     }
 
     async generateEffectAndPlace() {
 
-        const moduleName = MODULE.DEPENDENCY_PORTALLIB;
+        const moduleName = ELEVENLABS_CONSTANTS.DEPENDENCY_PORTALLIB;
         if (!isModuleActive(moduleName)) {
             ui.notifications.error(`Modul: ${moduleName} is not active. Placement of ambient sound effect is not available.`);
             return;
@@ -152,7 +174,7 @@ export class GenerateSoundEffectsApp extends Application {
         const easing = $('input[name="ta_sf_easing"]').is(':checked');
         const hidden = $('input[name="ta_sf_hidden"]').is(':checked');
 
-        let options = {path: sound.path, radius: radius, volume: volume, flags: flags, repeat: repeat, walls: walls, easing: easing, hidden: hidden};
+        let options = { path: sound.path, radius: radius, volume: volume, flags: flags, repeat: repeat, walls: walls, easing: easing, hidden: hidden };
 
         let portal = new Portal()
             .range(options.radius);
@@ -170,9 +192,8 @@ export class GenerateSoundEffectsApp extends Application {
     hideOverlay() {
         $('.ta-se-overlay').hide();
     }
-    
+
     showOverlay() {
         $('.ta-se-overlay').show();
     }
 }
-

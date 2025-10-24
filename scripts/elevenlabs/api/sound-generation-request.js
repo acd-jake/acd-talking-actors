@@ -1,4 +1,4 @@
-import { ElevenlabsRequest } from "./ElevenlabsRequests.js";
+import { ElevenlabsRequest } from "./elevenlabs-request.js";
 
 
 export class SoundGenerationRequest extends ElevenlabsRequest {
@@ -33,9 +33,9 @@ export class SoundGenerationRequest extends ElevenlabsRequest {
         if (this.settings.promptInfluence >= 0
             && this.settings.promptInfluence <= 1) {
             body = foundry.utils.mergeObject(body, {
-                "prompt_influence": this.settings.promptInfluence*1.0
+                "prompt_influence": this.settings.promptInfluence * 1.0
             });
-        } 
+        }
         return body;
     }
 
@@ -43,9 +43,9 @@ export class SoundGenerationRequest extends ElevenlabsRequest {
         if (this.settings.durationSeconds >= 0.5
             && this.settings.durationSeconds <= 22) {
             body = foundry.utils.mergeObject(body, {
-                "duration_seconds": this.settings.durationSeconds*1.0
+                "duration_seconds": this.settings.durationSeconds * 1.0
             });
-        } 
+        }
         return body;
     }
 }
