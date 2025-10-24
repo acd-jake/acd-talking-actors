@@ -7,10 +7,12 @@ export class GenerateSoundEffectsApp extends Application {
     text;
     durationSeconds;
     promptInfluence;
+    logger;
 
-    constructor(options = {}) {
+    constructor(logger, options = {}) {
         super(options);
 
+        this.logger = logger;
         this.durationSeconds = 0;
         this.promptInfluence = 0.3;
     }
@@ -98,14 +100,12 @@ export class GenerateSoundEffectsApp extends Application {
         try {
             response = await this.generateSoundEffect(this.text, { durationSeconds: this.durationSeconds, promptInfluence: this.promptInfluence });
         } catch (error) {
-            ui.notifications.error("Failed to generate sound effect: " + error.message);
-            console.error("Sound effect generation error:", error);
+            this.logger.error("Failed to generate sound effect:", error);
             return;
         }
 
         if (!response || typeof response.blob !== "function") {
-            ui.notifications.error("Invalid response received from sound effect API.");
-            console.error("Invalid response:", response);
+            this.logger.error("Invalid response received from sound effect API.", response);
             return;
         }
 
@@ -128,21 +128,21 @@ export class GenerateSoundEffectsApp extends Application {
 
         await playlist.createEmbeddedDocuments("PlaylistSound", [playlistSound]);
 
-        ui.notifications.info(`Sound ${playlistSound.name} added to playlist ${playlist.name}`);
-
-        console.log(`Sound ${playlistSound.name} added to playlist ${playlist.name}`);
+        this.logger.info(`Sound ${playlistSound.name} added to playlist ${playlist.name}`);
 
         return playlistSound;
     }
 
-        async generateSoundEffect(text, settings = {}) {
+    async generateSoundEffect(text, settings = {}) {
+        // Show busy overlay
+        this.showOverlay();
         let response = await new SoundGenerationRequest(text, settings).fetch();
-
+        // Hide busy overlay
+        this.hideOverlay();
         if (!response.ok) {
-            console.error(`Error: ${response.statusText}`);
+            this.logger.error(`Error: ${response.statusText}`);
             return;
         }
-
         return response;
     }
 
@@ -158,7 +158,7 @@ export class GenerateSoundEffectsApp extends Application {
 
         const moduleName = ELEVENLABS_CONSTANTS.DEPENDENCY_PORTALLIB;
         if (!isModuleActive(moduleName)) {
-            ui.notifications.error(`Modul: ${moduleName} is not active. Placement of ambient sound effect is not available.`);
+            this.logger.error(`Module: ${moduleName} is not active. Placement of ambient sound effect is not available.`);
             return;
         }
 

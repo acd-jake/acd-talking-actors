@@ -106,7 +106,7 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
             event.preventDefault();
             event.stopPropagation();
 
-            new GenerateSoundEffectsApp().render(true);
+            new GenerateSoundEffectsApp(this.logger).render(true);
         });
     }
     async initializeModels() {
