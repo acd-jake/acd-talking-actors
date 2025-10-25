@@ -35,7 +35,7 @@ export default class TalkingActorsConstants {
         POST_TO_CHAT: 'postSpokenTextToChat',
         AUTO_IN_CHARACTER_TALK: 'autoInCharacterTalk',
         DEBUG: 'debug',
-        NARRATORACTOR: 'narrating-actor'
+        NARRATORACTOR: 'narrating-actor',
     };
 
     // Hook names that the module will emit/consume

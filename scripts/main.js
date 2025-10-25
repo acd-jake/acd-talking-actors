@@ -2,7 +2,7 @@
  * Entry point class for the acd-talking-actors FoundryVTT module.
  */
 
-import ElevenlabsConnector from "./elevenlabs/elevenlabs_connector.js";
+import ElevenlabsConnector from "../../acd-talking-actors-elevenlabs/scripts/elevenlabs_connector.js";
 import ExampleTTSConnector from "./example_tts_connector.js";
 import { localize } from "./libs/functions.js";
 import TalkingActorsConstants from "./constants.js";
@@ -26,22 +26,20 @@ class ACDTalkingActors {
     ttsConnector = null;
     logger = null;
     chatProcessor = null;
-    
+    contextMenu = null;
+
+    get id() {
+        return ACDTalkingActors.MODULE_ID;
+    }
+
     constructor() {
         if (ACDTalkingActors.instance) return ACDTalkingActors.instance;
         ACDTalkingActors.instance = this;
         this._prefix = `[${ACDTalkingActors.MODULE_ID}]`;
-        
+
         this.logger = new Logger(this);
 
-        // Create an instance of the TTSConnectorInterface (abstract, for demonstration only)
-        // In real usage, use a subclass instead
-        this.ttsConnector = new ElevenlabsConnector();
 
-        this.chatProcessor = new ChatProcessor(this.ttsConnector, this.logger);
-
-        //TODO: remove this example connector
-        //this.ttsConnector = new ExampleTTSConnector();
 
         Hooks.once("ready", () => {
             game.socket.on('module.' + ACDTalkingActors.MODULE_ID, ({ container, historyItemId, text }) => {
@@ -53,30 +51,77 @@ class ACDTalkingActors {
 
     }
 
+    registerTtsConnector(connector) {
+        this.ttsConnector = connector;
+    }
+
     init() {
 
         this.logger.info("Initializing");
-        //this.log("Initializing");
+
+        Hooks.callAll(`acdTalkingActors.registerTtsConnector`, this, this.logger);
+
         this.registerSettings();
+
+        if (!this.ttsConnector) {
+            return;
+        }
+
         if (this.ttsConnector && typeof this.ttsConnector.registerSettings === "function") {
             this.ttsConnector.registerSettings();
         }
 
         // register any other initialization behavior here
 
+
         this.ttsConnector.init();
+
+        this.chatProcessor = new ChatProcessor(this.ttsConnector, this.logger);
 
         //add generic enrichers to TextEditor
         this.registerTextEditorEnrichers();
 
         Hooks.on("chatMessage", (chatlog, messageText, chatData) => {
-            //let result = this.processChatMessage(chatlog, messageText, chatData);
             let result = this.chatProcessor.processChatMessage(chatlog, messageText, chatData);
             return result;
         });
         let that = this;
 
         $(document).on('click', '.acd-ta-replay', async function () { await that.ttsConnector.replaySpeech($(this).data('item-id')); })
+
+        Hooks.on("getSceneControlButtons", (controls) => this.injectSceneControlButtons(controls));
+
+        Hooks.on('renderSettingsConfig', (app, html) => {
+            const moduleTab = app.form.querySelector('.tab[data-tab=acd-talking-actors]');
+            moduleTab.querySelector('input[name=acd-talking-actors\\.autoInCharacterTalk]').closest('div.form-group').after(this.createTitleNode(`${that.ttsConnector.label} Settings`));
+        });
+
+    }
+
+    createTitleNode (text) {
+        const title = document.createElement('h2');
+        title.classList.add('setting-header');
+        title.innerText = game.i18n.localize(text);
+        return title;
+    }
+
+    injectSceneControlButtons(controls) {
+        if (!controls?.tokens?.tools) {
+            this.logger.warn("No token controls found to inject mute button");
+            return;
+        }
+        
+        controls.tokens.tools['acdTaMute'] = {
+            name: "acdTaMute",
+            title: game.i18n.localize("acd.ta.controls.mute"),
+            icon: "fas fa-comment-slash",
+            order: Object.keys(controls.tokens.tools).length,
+            toggle: true,
+            visible: game.user.isGM,
+            onChange: (event, active) => {
+                game.acdTalkingActors.ttsConnector.isMuted = active;
+            }
+        }
     }
 
     isModuleAccessible() {
@@ -103,6 +148,23 @@ class ACDTalkingActors {
         this.logger.info("Ready");
         // perform runtime setup that requires other systems to be ready
 
+        if (!this.ttsConnector) {
+            this.logger.error("No TTS Connector registered! Please check the module installation.");
+            return;
+        }
+
+        if (game.settings.get(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.ENABLE_SELECTION_CONTEXT_MENU)) {
+            document.addEventListener('contextmenu', (ev) => {
+                if (ev.target.classList.contains('journal-entry-pages') ||
+                    $(ev.target).parents('div.journal-entry-pages').length ||
+                    ev.target.classList.contains('editor-content') ||
+                    $(ev.target).parents('div.editor-content').length) {
+                    this.showContextMenu(ev);
+                }
+            });
+        }
+
+
         if (game.user.isGM) {
             Hooks.on("renderTokenHUD", this.injectTokenHudButtons.bind(this));
             //this.hookOnRenderTokenHUD();
@@ -111,6 +173,9 @@ class ACDTalkingActors {
         if (this.isModuleAccessible()) {
             Hooks.on('getActorSheetHeaderButtons', this.injectActorSheetHeaderButton.bind(this));
         }
+
+        this.createJournalContextMenu();
+
     }
 
     injectActorSheetHeaderButton(sheet, buttons) {
@@ -126,8 +191,7 @@ class ACDTalkingActors {
         });
     }
 
-    injectTokenHudButtons (app, hudHtml, data)
-    {
+    injectTokenHudButtons(app, hudHtml, data) {
         if (!app.object.document.actorLink) {
             return;
         }
@@ -262,6 +326,7 @@ class ACDTalkingActors {
         // Implementation for reading aloud content with the given actors voice
         let narrator = options.narrator;
         if (!narrator) {
+            //TODO: change to method in connector, or better yet, implement a /narrate command
             narrator = this.tryGetSpeakerActorForNarratingActor()?._id;
         }
 
@@ -269,13 +334,13 @@ class ACDTalkingActors {
         content = `/${command} {${narrator}} ${content.replace(/\\n/g, '<br>')}`;
 
         ui.chat.processMessage(content);
-   }
+    }
 
     async readAloudCallback(html, postToChat) {
         let message = html.find("[name='readaloadtext']").first().val();
         let speaker = html.find("input[name='speaker']:checked").val();
         if (speaker == "narrator") {
-            this.readAloud(message, postToChat, {inCharacter: false});
+            this.readAloud(message, postToChat, { inCharacter: false });
         } else {
             this.readAloudCurrentActor(message, postToChat);
         }
@@ -284,6 +349,88 @@ class ACDTalkingActors {
     createChatCommand(postToChat) {
         return postToChat ? "talk" : "talk-s";
     }
+
+    async showContextMenu(event) {
+        const time = this.contextMenu.isOpen() ? 100 : 0;
+        this.contextMenu.hide();
+        setTimeout(() => {
+            this.contextMenu.show(event.pageX, event.pageY);
+        }, time);
+    }
+
+    createJournalContextMenu() {
+        this.contextMenu = new ContextMenuNT({
+            theme: 'default',
+            items: [
+                {
+                    icon: 'comment',
+                    name: game.i18n.localize("acd.ta.controls.readAloud"),
+                    action: () => {
+                        const selection = this.getSelectionText();
+                        if (selection)
+                            this.readAloud(selection, true);
+                        this.contextMenu.hide();
+                    },
+                },
+                {
+                    icon: 'comment',
+                    name: game.i18n.localize("acd.ta.controls.readAloudWithoutChat"),
+                    action: () => {
+                        const selection = this.getSelectionText();
+                        if (selection)
+                            this.readAloud(selection, false);
+                        this.contextMenu.hide();
+                    },
+                },
+                {
+                    icon: 'comment',
+                    name: game.i18n.localize("acd.ta.controls.readAloudCurrentActor"),
+                    action: () => {
+                        const selection = this.getSelectionText();
+                        if (selection)
+                            this.readAloudCurrentActor(selection, true);
+                        this.contextMenu.hide();
+                    },
+                },
+                {
+                    icon: 'comment',
+                    name: game.i18n.localize("acd.ta.controls.readAloudCurrentActorWithoutChat"),
+                    action: () => {
+                        const selection = this.getSelectionText();
+                        if (selection)
+                            this.readAloudCurrentActor(selection, false);
+                        this.contextMenu.hide();
+                    },
+                },
+                {
+                    icon: 'cancel',
+                    name: game.i18n.localize("acd.ta.controls.cancel"),
+                    action: () => {
+                        this.contextMenu.hide();
+                    },
+                },
+            ],
+        });
+    }
+
+    getSelectionText() {
+        let html = '';
+        const selection = window.getSelection();
+        if (selection?.rangeCount && !selection.isCollapsed) {
+            const fragments = selection.getRangeAt(0).cloneContents();
+            const size = fragments.childNodes.length;
+            for (let i = 0; i < size; i++) {
+                if (fragments.childNodes[i].nodeType == fragments.TEXT_NODE)
+                    html += fragments.childNodes[i].wholeText;
+                else
+                    html += fragments.childNodes[i].outerHTML;
+            }
+        }
+        if (!html) {
+        }
+        return html;
+    }
+
 }
 
 /* Expose the constructor for other modules/dev tools if desired */

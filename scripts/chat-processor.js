@@ -36,6 +36,7 @@ export class ChatProcessor {
     static talkSilentCommand = "talk-s";
     static icCommand = "ic";
     static oocCommand = "ooc";
+    static narrateCommand = "narrate";
 
     /* constructor */
     constructor(ttsConnector, logger) {
@@ -101,7 +102,13 @@ export class ChatProcessor {
         let speakerActor;
 
         if (!voice_id) {
-            speakerActor = SpeakerResolver.resolveSpeakerActor(messageVoiceActor,  chatData) ;
+            if (command === ChatProcessor.narrateCommand) {
+                this.logger.debug("Narrate command detected; resolving narrator actor.");
+                speakerActor = SpeakerResolver.tryGetSpeakerActorForNarratingActor();
+                speakerActor.isNarrator = true;
+            } else {
+                speakerActor = SpeakerResolver.resolveSpeakerActor(messageVoiceActor,  chatData) ;
+            }
         }
 
         if (speakerActor) {
@@ -118,6 +125,10 @@ export class ChatProcessor {
                 else {
                     chatData.speaker.alias = localize("acd.ta.chat.unknownSpeaker");   
                 } 
+            }
+            else {
+                chatData.speaker.alias = null;
+                chatData.speaker.actor = null; 
             }
         }
     
@@ -207,6 +218,7 @@ export class ChatProcessor {
         switch (command) {
             case ChatProcessor.talkCommand:
             case ChatProcessor.talkSilentCommand:
+            case ChatProcessor.narrateCommand:
                 return true;
             case ChatProcessor.icCommand:
                 return isAutoInCharacterTalkEnabled;

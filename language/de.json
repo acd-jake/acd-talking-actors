@@ -1,10 +1,6 @@
 {
     "acd.ta": {
         "settings": {
-            "ApiKey": "API-Key",
-            "ApiKeyHint": "Dein API Key von Elevenlabs",
-            "MasterApiKey": "Haupt-API-Key",
-            "MasterApiKeyHint": "Der Elevenlabs API Key, der von allen Clients genutzt wird, für die kein eigener API Key angegeben wurde. Lasse ihn frei, wenn Du Deinen Elevenlabs Account nicht mit deinen Spielern teilen möchtest.",
             "NarratorActor": "Erzählender Akteur (ID)",
             "NarratorActorHint": "Der Akteur mit diesem Dokument-Id übernimmt die Rolle des Erzählers. Das bedeutet, dass die Stimmeinstellungen dieses Akteurs benutzt werden, wenn entweder kein Akteur beim /talk Kommando ausgewählt wurde oder keine Stimmeinstellungen für diesen vorgenommen wurden.",
             "AllowUsers": "Benutzer erlaubt",
@@ -14,11 +10,7 @@
             "PostTextToChat": "Schicke den gesprochenen Text in den Chat",
             "PostTextToChatHint": "Wenn diese Option aktiviert ist, wird der gesprochene Text in das Chatwindow geschrieben (und möglicherweise als Sprechblase über dem Token des Akteurs angezeigt).",
             "AutoInCharacterTalk": "In-Character Chatnachrichten automatisch vorlesen",
-            "AutoInCharacterTalkHint": "Wenn diese Option aktiviert ist, werden Chatnachrichten, die mit dem /ic-Befehl In-Character gesendet werden, automatisch vorgelesen.",
-            "SoundEffectFolder": "Ordner für Soundeffekte",
-            "SoundEffectFolderHint": "In diesem Ordner werden die Dateien der erzeugten Soundeffekte abgelegt.",
-            "SoundEffectPlaylist": "Playliste für Soundeffekte",
-            "SoundEffectPlaylistHint": "Der Name der Playliste, in der die generierten Soundeffekte abgelegt werden."
+            "AutoInCharacterTalkHint": "Wenn diese Option aktiviert ist, werden Chatnachrichten, die mit dem /ic-Befehl In-Character gesendet werden, automatisch vorgelesen."
         },
         "controls": {
             "button.title": "Stimmeinstellungen",
@@ -27,25 +19,8 @@
             "readAloudWithoutChat": "Vorlesen (Erzähler)\r\nohne Chatnachricht",
             "readAloudCurrentActor": "Vorlesen (Akteur)",
             "readAloudCurrentActorWithoutChat": "Vorlesen (Akteur) ohne Chatnachricht",
-            "cancel": "Abbrechen"
-        },
-        "VoiceSettings": {
-            "Title": "Stimmeinstellungen für den Akteur",
-            "Actors": "Akteure",
-            "AddActor": "Akteur hinzufügen",
-            "Add": "Hinzufügen",
-            "ClearAll": "Alle Akteure entfernen",
-            "Clear": "Alles entfernen",
-            "DeleteActor": "Diesen Akteur entfernen",
-            "VoiceLabel": "Stimme",
-            "AcceptData": "Annehmen",
-            "Close": "Schliessen",
-            "PlaySample": "Beispiel abspielen",
-            "VoiceSelection": "Stimmauswahl",
-            "Settings": "Einstellungen für die Stimme",
-            "SimilarityBoost": "Similarity Boost",
-            "Stability": "Stability",
-            "Style": "Style"
+            "cancel": "Abbrechen",
+            "mute": "Talking Actors stummschalten"
         },
         "TokenHud": {
             "dialog.title": "Text vorlesen",
@@ -55,30 +30,6 @@
             "actor": "Akteur",
             "withChat": "Vorlesen",
             "withoutChat": "Vorlesen <b>ohne</b> Chatnachricht"
-        },
-        "SoundEffects": {
-            "dialog.title": "Soundeffekte erzeugen",
-            "createbutton": "Soundeffekte erzeugen",
-            "createbuttonHint": "Neue Soundeffekte erzeugen",
-            "effectDescription": "Beschreibung des Effekts",
-            "effectDescriptionHint": "Der Text, der in einen Soundeffekt umgewandelt werden soll (auf Englisch).",
-            "generationSettings": "Einstellungen für die Generation",
-            "secondsLabel": "Dauer",
-            "secondsUnit": "Sekunde(n)",
-            "automatic": "automatisch",
-            "promptInfluenceLabel": "Einfluss der Beschreibung",
-            "filename": "Name des Effekts",
-            "buttonGenerate": "Erzeugen",
-            "buttonGenerateHint": "Erzeugt den Soundeffekt und speichert ihn in der Playlist",
-            "buttonGenerateAndPlace": "Erzeugen und Platzieren",
-            "buttonGenerateAndPlaceHint": "Erzeugt den Soundeffekt, speichert ihn in der Playlist und platziert ihn als Umgebungsgeräusch in der Szene.",
-            "headerAmbientSoundOptions": "Umgebungsgeräusch-Optionen",
-            "radius": "Effekt-Radius",
-            "volume": "Maximale Lautstärke",
-            "repeat": "Wiederholen",
-            "walls": "Durch Wände begrenzt",
-            "easing": "Lautstärke anpassen",
-            "hidden": "Versteckt"
         },
         "errors": {
             "noTokenSelected": "Mindestens ein Token muss ausgewählt sein.",

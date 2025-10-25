@@ -111,15 +111,15 @@ export default class Logger {
                             ? "undefined"
                             : a === null
                             ? "null"
-                            : typeof a === "string"
+                            : typeof a === "string" 
                             ? a
                             : (typeof a === "object" && a?.constructor?.name === "Error")
                             ? `${a?.name}: ${a?.message}`
                             : JSON.stringify(a, Logger._safeReplacer, 2)
                     )
                     .join(" ");
-                if (levelName === "error" && ui.notifications.error) ui.notifications.error(text);
-                else if (levelName === "warn" && ui.notifications.warn) ui.notifications.warn(text);
+                if (levelName === "error" && ui.notifications.error) ui.notifications.error(`${prefix}${text}`);
+                else if (levelName === "warn" && ui.notifications.warn) ui.notifications.warn(`${prefix}${text}`);
             }
         } catch (e) {}
     }

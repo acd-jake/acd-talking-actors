@@ -16,16 +16,36 @@ import Logger from "./libs/logger.js";
 /* eslint-disable no-unused-vars */
 export default class TTSConnectorInterface {
     logger = null;
+    mainModule = null;
+    muted = false;
+
     /**
      * Create a connector instance.
      * @param {object} [options] - connector-specific options
      */
-    constructor(options = {}) {
+    constructor(mainModule, logger, options = {}) {
+        if (!mainModule) {
+            throw new Error("TTSConnectorInterface requires a reference to the main module.");
+        }
+        if (!logger) {
+            throw new Error("TTSConnectorInterface requires a logger instance.");
+        }
+
+        this.mainModule = mainModule;
+        this.logger = logger;
         this.options = options;
         this._selectedVoice = null;
         this._volume = 1.0;
         this._speaking = false;
         this.logger = new Logger(this);
+    }
+
+    get isMuted() {
+        return this.muted;
+    }
+    
+    set isMuted(value) {
+        this.muted = value;
     }
 
     /* -------------------------
@@ -66,6 +86,9 @@ export default class TTSConnectorInterface {
         return [];
     }
 
+    get mainSettingsId() {
+        return this.mainModule.id;
+    }
     /**
      * Register settings with Foundry VTT.
      * Default implementation uses getSettingsSchema() and calls game.settings.register.
@@ -74,7 +97,7 @@ export default class TTSConnectorInterface {
     registerSettings() {
         if (typeof game === "undefined" || !game.settings) return;
 
-        const ns = `${this.id}`;
+        const ns = `${this.mainSettingsId}`;
         const schema = this.tryGetSettingSchema();
 
         for (const def of schema) {
@@ -108,12 +131,12 @@ export default class TTSConnectorInterface {
     }
 
     getStringFlagFromActor(actor, flagName) {
-        const value = actor.getFlag(this.id, flagName) || null;
+        const value = actor.getFlag(this.mainSettingsId, flagName) || null;
         return value;
     }
 
     getObjectFlagFromActor(actor, flagName) {
-        const value = actor.getFlag(this.id, flagName) || {};
+        const value = actor.getFlag(this.mainSettingsId, flagName) || {};
         return value;
     }
 
@@ -188,30 +211,6 @@ export default class TTSConnectorInterface {
     }
 
     /**
-     * Select a voice by id for subsequent synth calls.
-     * @param {string} voiceId
-     */
-    selectVoice(voiceId) {
-        this._selectedVoice = voiceId;
-    }
-
-    /**
-     * Get the currently selected voice id.
-     * @returns {string|null}
-     */
-    getSelectedVoice() {
-        return this._selectedVoice;
-    }
-
-    /**
-     * Set playback volume (0.0 - 1.0).
-     * @param {number} volume
-     */
-    setVolume(volume) {
-        this._volume = Math.max(0, Math.min(1, Number(volume) || 0));
-    }
-
-    /**
      * Optionally open a UI for configuring voice settings for a specific token.
      * Subclasses may override to provide a custom settings interface.
      * @param {*} _token - The token for which to open voice settings (unused in base class)
@@ -221,15 +220,7 @@ export default class TTSConnectorInterface {
         // default: no-op
     }
 
-    /**
-     * Get current volume.
-     * @returns {number}
-     */
-    getVolume() {
-        return this._volume;
-    }
-
-    /**
+     /**
      * Does the connector currently have an active playback?
      * @returns {boolean}
      */
@@ -293,4 +284,4 @@ export default class TTSConnectorInterface {
         // default: no-op
     }
 }
-
+    
