@@ -150,6 +150,7 @@ class ACDTalkingActors {
 
         if (!this.ttsConnector) {
             this.logger.error("No TTS Connector registered! Please check the module installation.");
+            ui.errors.show(`ACD Talking Actors module error: No TTS Connector registered! Please check the module installation.`);
             return;
         }
 
@@ -316,6 +317,15 @@ class ACDTalkingActors {
     async readAloudCurrentActor(content, postToChat = true, options = {}) {
         // Implementation for reading aloud content with the current actor's voice
         let command = this.createChatCommand(postToChat);
+
+        content = `/${command} ${content.replace(/\\n/g, '<br>')}`;
+
+        ui.chat.processMessage(content);
+    }
+
+    async readAloudNarrator(content, options = {}) {
+        // Implementation for reading aloud content with the current actor's voice
+        let command = "narrate";
 
         content = `/${command} ${content.replace(/\\n/g, '<br>')}`;
 

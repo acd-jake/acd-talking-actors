@@ -21,21 +21,15 @@ export class ReadAloudNarratorEnricher {
     label = "TA - Talking Actors - Narrate";
     pattern = /@(?:Narrate)(?:\{([\S\s]+)\})/g;
     enricher = async (match, options) => {
-        var content = match[2];
+        var content = match[1];
 
-        let narrator = game.talkingsactors.connect.tryGetSpeakerActorForNarratingActor()?._id;
-        // if (narrator.match(/[a-zA-Z0-9]{16}/)) {
-        //     // the narrator is specified by an Id... get his actor name
-        //     narratorForDisplay = game.actors.get(narrator)?.name ?? narrator;            
-        // }
         var onClick = `
-          game.acdTalkingActors.readAloud(\`${content}\`,{narrator: \`${narrator}\`, inCharacter: false});
+          game.acdTalkingActors.readAloudNarrator(\`${content}\`,{inCharacter: false});
           `;
 
         var enricherData = {
             label: "TA - Talking Actors - Narrate Aloud",
             click: onClick,
-            narrator: narrator,
             content: content,
         };
 
