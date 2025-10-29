@@ -122,6 +122,7 @@ class ACDTalkingActors {
                 game.acdTalkingActors.ttsConnector.isMuted = active;
             }
         }
+        
     }
 
     isModuleAccessible() {
