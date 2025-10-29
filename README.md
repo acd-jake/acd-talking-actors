@@ -1,6 +1,6 @@
 # acd-talking-actors
 
-acd-talking-actors is a FoundryVTT module that brings immersive, AI-powered voice and sound features to your tabletop games. It enables actors and narrators to speak in chat using customizable text-to-speech (TTS) integration, and provides tools for generating, managing, and replaying voice lines
+acd-talking-actors is a FoundryVTT module that brings immersive, AI-powered voice and sound features to your tabletop games. It enables actors and narrators to speak using customizable text-to-speech (TTS) integration, and provides tools for generating, managing, and replaying voice lines
 
 ## Features
 
