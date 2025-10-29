@@ -1,16 +1,32 @@
 # acd-talking-actors
-Selectable and adjustable voices for FoundryVTT actors through Elevenlabs integration. You can configure voices, finetune them and assign them to your linked actors in FoundryVTT using the voice settings dialog in the scene controls bar.
 
-Using the chat command /talk with an actor selected will let the character speak with the configured voice. Alternatively use /talk [VoiceName] to override the configuration and let the character speak with the given voice.
+acd-talking-actors is a FoundryVTT module that brings immersive, AI-powered voice and sound features to your tabletop games. It enables actors and narrators to speak in chat using customizable text-to-speech (TTS) integration, and provides tools for generating, managing, and replaying voice lines
 
-An Elevenlabs subscription is required for the module to work. https://beta.elevenlabs.io/
+## Features
 
-* This module is a spritual successor to the module "Elevenlabs for Foundry" by Vexthecollector (https://github.com/Vexthecollector/elevenlabs-for-foundry/tree/main).
-* This module optionally uses the [Yendors Scene Actors](https://foundryvtt.com/packages/yendors-scene-actors) module if this is installed. If an actor is set to focus in the Scene Actors module, it is used for the voice output and does not need to have a token in the active scene. (From version 0.4)
-* This module optionally uses the [Conversation Hud](https://foundryvtt.com/packages/conversation-hud) module if this is installed. If the "Speak As" option is set in the Conversation Hud module, the active conversation participant is used for the voice output and does not need to have a token in the active scene. (From version 0.5)
-* Supports read-aloud texts in FoundryVTT journals with an insertable macro (with free voice selection by voice id, actor name or actor id). (From version 0.6)
-* Offers the option of playing spoken text repeatedly by clicking a button on the chat messages. The replayed text will be loaded from the history of generated samples in Elevenlabs and thus does not count against the word limit. (From version 0.6)
-* Supports entering of text to be read aloud with a button in the token hud (from version 0.8)
-* Offers the option to suppres posting the spoken text to the chat (from version 0.8)
-* Provides an api to be used by third party modules (from version 0.8)
-* Supports generation of sound effects based on textual description from the playlist sidebar (from version 0.8)
+- Assign and configure voices for actors using the Voice Settings dialog
+- Use `/talk` chat command to make selected actors speak with their configured or overridden voice
+- Optional integration with [Yendors Scene Actors](https://foundryvtt.com/packages/yendors-scene-actors) and [Conversation Hud](https://foundryvtt.com/packages/conversation-hud)
+- Read-aloud support for FoundryVTT journals, with macro insertion and flexible voice selection
+- Token HUD button for entering and reading aloud custom text
+- Option to suppress posting spoken text to chat
+- API for third-party module integration
+- Localized language support (English, German)
+- Extensible architecture for additional TTS providers
+
+## Installation
+
+1. Install directly through Foundry's module manager or manually using this manifest URL: https://github.com/acd-jake/acd-talking-actors/releases/latest/download/module.json
+2. Install a tts connector of your choice ( [acd-talking-actors-elevenlabs](https://github.com/acd-jake/acd-talking-actors-elevenlabs) is a functionally implementation for Elevenlabs ).
+3. Enable both `acd-talking-actors` and your tts connector in your FoundryVTT game settings.
+
+
+## Credits
+
+- Developed by acd-jake
+- Inspired by "Elevenlabs for Foundry" by Vexthecollector
+- Powered by ElevenLabs
+
+---
+
+For more information, see the [GitHub Wiki](https://github.com/acd-jake/acd-talking-actors/wiki) or the [acd-talking-actors-elevenlabs](https://github.com/acd-jake/acd-talking-actors-elevenlabs) project for ElevenLabs integration.
