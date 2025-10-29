@@ -89,7 +89,7 @@ class ACDTalkingActors {
 
         $(document).on('click', '.acd-ta-replay', async function () { await that.ttsConnector.replaySpeech($(this).data('item-id')); })
 
-        Hooks.on("getSceneControlButtons", (controls) => this.injectSceneControlButtons(controls));
+        Hooks.on("getSceneControlButtons", (controls) => this.injectControlToolButtons(controls));
 
         Hooks.on('renderSettingsConfig', (app, html) => {
             const moduleTab = app.form.querySelector('.tab[data-tab=acd-talking-actors]');
@@ -105,17 +105,17 @@ class ACDTalkingActors {
         return title;
     }
 
-    injectSceneControlButtons(controls) {
-        if (!controls?.tokens?.tools) {
-            this.logger.warn("No token controls found to inject mute button");
+    injectControlToolButtons(controls) {
+        if (!controls?.sounds?.tools) {
+            this.logger.warn("No sound controls found to inject mute button");
             return;
         }
-        
-        controls.tokens.tools['acdTaMute'] = {
+
+        controls.sounds.tools['acdTaMute'] = {
             name: "acdTaMute",
             title: game.i18n.localize("acd.ta.controls.mute"),
             icon: "fas fa-comment-slash",
-            order: Object.keys(controls.tokens.tools).length,
+            order: Object.keys(controls.sounds.tools).length,
             toggle: true,
             visible: game.user.isGM,
             onChange: (event, active) => {
