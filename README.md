@@ -31,4 +31,4 @@ acd-talking-actors is a FoundryVTT module that brings immersive, AI-powered voic
 
 ---
 
-For more information, see the [GitHub Wiki](https://github.com/acd-jake/acd-talking-actors/wiki) or the [acd-talking-actors-elevenlabs](https://github.com/acd-jake/acd-talking-actors-elevenlabs) project for ElevenLabs integration.
+For more information, see the [GitHub Wiki](https://github.com/acd-jake/acd-talking-actors/wiki).
