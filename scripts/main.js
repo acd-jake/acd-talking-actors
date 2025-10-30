@@ -114,6 +114,8 @@ class ACDTalkingActors {
         $(document).on('click', '.acd-ta-replay', async function () { await that.ttsConnector.replaySpeech($(this).data('item-id')); })
 
         Hooks.on("getSceneControlButtons", (controls) => this.injectControlToolButtons(controls));
+        
+        Hooks.on('getActorContextOptions', (app, entries) => this.injectActorContextOptions(app, entries));
 
         Hooks.on('renderSettingsConfig', (app, html) => {
             const moduleTab = app.form.querySelector('.tab[data-tab=acd-talking-actors]');
@@ -147,6 +149,45 @@ class ACDTalkingActors {
             }
         }
         
+    }
+
+    injectActorContextOptions(application, entries) {
+        if (!application || !entries ) return;
+
+        if (application.id !== 'actors') {
+            this.logger.warn('Application is not Actors:', { application });
+            return;
+        }
+
+        const voiceSettingsContextOption = {
+            name: 'acd.ta.controls.button.title',
+            icon: '<i class="fas fa-comment"></i>',
+            condition: () => this.isModuleAccessible(),
+            callback: async (entry) => {
+                this.onActorContextOptionClick(entry);
+            }
+        };
+
+        if (!entries.find(e => e.name === voiceSettingsContextOption.name)) {
+            entries.push(voiceSettingsContextOption);
+        }
+    }
+
+    onActorContextOptionClick(entry) {
+        const documentId = entry.dataset.entryId;
+        if (!documentId) {
+            this.logger.warn('No documentId found in context menu entry:', { entry });
+            return;
+        }
+
+        const actor = game.actors.get(documentId);
+
+        if (!actor) {
+            this.logger.warn('Actor not found:', { documentId });
+            return;
+        }
+
+        this.openVoiceEditor([actor]);
     }
 
     isModuleAccessible() {
