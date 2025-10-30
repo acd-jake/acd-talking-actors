@@ -109,17 +109,18 @@ class ACDTalkingActors {
             let result = this.chatProcessor.processChatMessage(chatlog, messageText, chatData);
             return result;
         });
+
         let that = this;
 
         $(document).on('click', '.acd-ta-replay', async function () { await that.ttsConnector.replaySpeech($(this).data('item-id')); })
 
         Hooks.on("getSceneControlButtons", (controls) => this.injectControlToolButtons(controls));
+        Hooks.on('renderSettingsConfig', (app, _html) => this.injectSettingsHeaderLabel(app, that));
+    }
 
-        Hooks.on('renderSettingsConfig', (app, html) => {
-            const moduleTab = app.form.querySelector('.tab[data-tab=acd-talking-actors]');
-            moduleTab.querySelector('input[name=acd-talking-actors\\.autoInCharacterTalk]').closest('div.form-group').after(this.createTitleNode(`${that.ttsConnector.label} Settings`));
-        });
-
+    injectSettingsHeaderLabel(app, that) {
+        const moduleTab = app.form.querySelector('.tab[data-tab=acd-talking-actors]');
+        moduleTab.querySelector('input[name=acd-talking-actors\\.autoInCharacterTalk]').closest('div.form-group').after(this.createTitleNode(`${that.ttsConnector.label} Settings`));
     }
 
     createTitleNode (text) {
@@ -193,7 +194,6 @@ class ACDTalkingActors {
 
         if (game.user.isGM) {
             Hooks.on("renderTokenHUD", this.injectTokenHudButtons.bind(this));
-            //this.hookOnRenderTokenHUD();
         }
 
         if (this.isModuleAccessible()) {
@@ -327,7 +327,7 @@ class ACDTalkingActors {
         });
         return connectorChoices;
     }
-    
+
     openVoiceEditor(actors) {
         if (!actors || actors.length == 0) return;
 
@@ -496,7 +496,6 @@ Hooks.once("init", async function () {
     game.acdTalkingActors = new ACDTalkingActors();
     game.acdTalkingActors.init();
 });
-
 
 
 Handlebars.registerHelper('ifEquals', function (arg1, arg2, options) {
