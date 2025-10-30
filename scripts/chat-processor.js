@@ -84,7 +84,7 @@ export class ChatProcessor {
         const messageVoiceActor = messageData[3];
         const messageText = messageData[4];
 
-        const inCharacter = command == ChatProcessor.icCommand;
+        let inCharacter = command == ChatProcessor.icCommand;
 
         if (command === ChatProcessor.talkSilentCommand) {
             postToChat = false;
@@ -114,8 +114,32 @@ export class ChatProcessor {
         if (speakerActor) {
             this.logger.info(`Speaking actor: ${speakerActor.name} (${speakerActor._id})`);
 
+            inCharacter = !speakerActor.isNarrator;
+
             voice_id = this.ttsConnector.getVoiceIdFromActor(speakerActor);
             settings = this.ttsConnector.getVoiceSettingsFromActor(speakerActor);
+            
+            if (!voice_id || !settings) {
+                this.logger.info(`No voice configured for actor "${speakerActor.name}". Using voice of narrator actor.`);
+
+                let defaultSpeaker = SpeakerResolver.tryGetSpeakerActorForNarratingActor();
+                if (defaultSpeaker) {
+                    voice_id = this.ttsConnector.getVoiceIdFromActor(defaultSpeaker);
+                    settings = this.ttsConnector.getVoiceSettingsFromActor(defaultSpeaker);
+                    
+                    if (voice_id === null) {
+                        this.logger.warn(`No voice configured for default narrator actor "${defaultSpeaker.name}". Please configure a voice for this actor. Skipping TTS for message.`);
+                        voice_id = null;
+                        settings = null;
+                    }
+                }
+                else {
+                    this.logger.warn(`No default narrator actor found, please configure a narrator actor in the module settings. Skipping TTS for message.`);
+                    voice_id = null;
+                    settings = null;
+                }
+            }
+
 
             if ( !speakerActor.isNarrator ) {
                 chatData.speaker.actor = speakerActor._id;
@@ -132,7 +156,7 @@ export class ChatProcessor {
             }
         }
     
-        this.logger.info(`Voice ID: ${voice_id}`);
+        this.logger.debug(`Voice ID: ${voice_id}`);
 
         this.processAndPostMessage(voice_id, speakerActor, postToChat, chatData, messageText, inCharacter, settings, chatlog);
 
@@ -159,8 +183,6 @@ export class ChatProcessor {
                 chatlog.updateMessage(chatMessage)
             }
         } else {
-            ui.notifications.warn(localize("acd.ta.errors.unknownVoice"));
-            
             this.postToChat(chatData, ``, messageText, inCharacter);
         }
     }

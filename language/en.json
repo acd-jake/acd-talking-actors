@@ -50,7 +50,8 @@
             "notAllLinkedActors": "Not all selected token are linked to actors. Voice settings will only assigned to the linked actors.",
             "noApiKey": "The Elevenlabs api key has to be configured in the settings first.",
             "unknownVoice": "No Elevenlabs voice found.",
-            "tokensAlreadyAdded": "Some actors are already contained and not added again."
+            "tokensAlreadyAdded": "Some actors are already contained and not added again.",
+            "noVoiceForActor": "No voice configured for actor."
         },
         "chat": {
             "textTalked": "Talked Text:",

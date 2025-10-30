@@ -221,17 +221,7 @@ class ACDTalkingActors {
             return;
         }
 
-        if (game.settings.get(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.ENABLE_SELECTION_CONTEXT_MENU)) {
-            document.addEventListener('contextmenu', (ev) => {
-                if (ev.target.classList.contains('journal-entry-pages') ||
-                    $(ev.target).parents('div.journal-entry-pages').length ||
-                    ev.target.classList.contains('editor-content') ||
-                    $(ev.target).parents('div.editor-content').length) {
-                    this.showContextMenu(ev);
-                }
-            });
-        }
-
+        this.initializeJournalEntryContextMenu();
 
         if (game.user.isGM) {
             Hooks.on("renderTokenHUD", this.injectTokenHudButtons.bind(this));
@@ -243,6 +233,19 @@ class ACDTalkingActors {
 
         this.createJournalContextMenu();
 
+    }
+
+    initializeJournalEntryContextMenu() {
+        if (game.settings.get(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.ENABLE_SELECTION_CONTEXT_MENU)) {
+            document.addEventListener('contextmenu', (ev) => {
+                if (ev.target.classList.contains('journal-entry-pages') ||
+                    $(ev.target).parents('div.journal-entry-pages').length ||
+                    ev.target.classList.contains('editor-content') ||
+                    $(ev.target).parents('div.editor-content').length) {
+                    this.showContextMenu(ev);
+                }
+            });
+        }
     }
 
     injectActorSheetHeaderButton(sheet, buttons) {
@@ -422,8 +425,8 @@ class ACDTalkingActors {
         // Implementation for reading aloud content with the given actors voice
         let narrator = options.narrator;
         if (!narrator) {
-            //TODO: change to method in connector, or better yet, implement a /narrate command
-            narrator = this.tryGetSpeakerActorForNarratingActor()?._id;
+            this.readAloudNarrator(content, options);
+            return
         }
 
         let command = this.createChatCommand(postToChat);

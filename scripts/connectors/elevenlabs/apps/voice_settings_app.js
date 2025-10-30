@@ -47,7 +47,7 @@ export class VoiceSettingsApp extends Application {
             return undefined;
 
         // Safely read nested flags using optional chaining and computed property access
-        let voice_model_id = this.actors[0].flags?.[VoiceSettingsApp.moduleKey]?.[ELEVENLABS_FLAGS.VOICE_MODEL_ID];
+        let voice_model_id = this.actors[0].flags?.[VoiceSettingsApp.moduleKey]?.[ELEVENLABS_FLAGS.VOICE_MODEL_ID] || this.connector.getDefaultModelId();
         
         return voice_model_id;
     }
@@ -71,7 +71,7 @@ export class VoiceSettingsApp extends Application {
         if (!currentModel) return "";
 
         // Safely read nested flags using optional chaining and computed property access
-        let language_id = this.actors[0].flags?.[VoiceSettingsApp.moduleKey]?.[ELEVENLABS_FLAGS.LANGUAGE_ID];
+        let language_id = this.actors[0].flags?.[VoiceSettingsApp.moduleKey]?.[ELEVENLABS_FLAGS.LANGUAGE_ID] || this.connector.getDefaultLanguageId();
         
         let foundLanguage = currentModel.languages.find(l => l.language_id === language_id);
         

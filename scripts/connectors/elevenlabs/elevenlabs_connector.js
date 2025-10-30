@@ -215,12 +215,12 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
     }
 
     getModelIdFromActor(actor) {
-        const modelId = this.getStringFlagFromActor(actor, ELEVENLABS_FLAGS.VOICE_MODEL_ID);
+        const modelId = this.getStringFlagFromActor(actor, ELEVENLABS_FLAGS.VOICE_MODEL_ID) || this.getDefaultModelId();
         return modelId;
     }
 
     getLanguageIdFromActor(actor) {
-        const languageId = this.getStringFlagFromActor(actor, ELEVENLABS_FLAGS.LANGUAGE_ID);
+        const languageId = this.getStringFlagFromActor(actor, ELEVENLABS_FLAGS.LANGUAGE_ID) || this.getDefaultLanguageId();
         return languageId;
     }
 
@@ -296,8 +296,7 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
 
     retrieveLanguageId(actor, modelId) {
         if (!actor) {
-            let defaultLanguage = game.settings.get(this.mainModule.id, ELEVENLABS_CONSTANTS.DEFAULT_LANGUAGE) || null;
-            return defaultLanguage;
+            return this.getDefaultLanguageId();
         }
 
         let languageId = this.getStringFlagFromActor(actor, ELEVENLABS_FLAGS.LANGUAGE_ID);
@@ -315,10 +314,14 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
         return languageId;
     }
 
+    getDefaultLanguageId() {
+        let defaultLanguageId = game.settings.get(this.mainModule.id, ELEVENLABS_CONSTANTS.DEFAULT_LANGUAGE) || null;
+        return defaultLanguageId;
+    }
+
     retrieveModelId(actor) {
         if (!actor) {
-            let defaultModel = game.settings.get(this.mainModule.id, ELEVENLABS_CONSTANTS.DEFAULT_MODEL) || null;
-            return defaultModel;
+            return this.getDefaultModelId();
         }
 
         let modelId = this.getStringFlagFromActor(actor, ELEVENLABS_FLAGS.VOICE_MODEL_ID);
@@ -334,6 +337,11 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
             }
         }
         return modelId;
+    }
+
+    getDefaultModelId() {
+        let defaultModelId = game.settings.get(this.mainModule.id, ELEVENLABS_CONSTANTS.DEFAULT_MODEL) || null;
+        return defaultModelId;
     }
 
     async stop() {

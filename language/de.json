@@ -49,7 +49,8 @@
             "notAllLinkedActors": "Nicht alle ausgewählten Token sind mit Akteuren verbunden. Die Stimmeinstellungen werden nur für die verbundenen Akteure übernommen.",
             "noApiKey": "Der Api-Schlüssel von Elevenlabs muss zuerst in den Einstellungen konfiguriert werden.",
             "unknownVoice": "Keine Stimme von Elevenlabs gefunden.",
-            "tokensAlreadyAdded": "Einige Akteure sind bereits enthalten und werden nicht neu hinzugefügt."
+            "tokensAlreadyAdded": "Einige Akteure sind bereits enthalten und werden nicht neu hinzugefügt.",
+            "noVoiceForActor": "Keine Stimme für den Akteur konfiguriert."
         },
         "chat": {
             "textTalked": "Gesprochener Text:",
