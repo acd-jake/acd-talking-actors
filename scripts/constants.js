@@ -31,6 +31,7 @@ export default class TalkingActorsConstants {
     }
     static SETTINGS = {
         ALLOW_USERS: 'allow-users',
+        ACTIVE_CONNECTOR: 'active-connector',
         ENABLE_SELECTION_CONTEXT_MENU: 'enableContextMenuOnSelection',
         POST_TO_CHAT: 'postSpokenTextToChat',
         AUTO_IN_CHARACTER_TALK: 'autoInCharacterTalk',

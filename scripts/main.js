@@ -2,8 +2,6 @@
  * Entry point class for the acd-talking-actors FoundryVTT module.
  */
 
-import ElevenlabsConnector from "../../acd-talking-actors-elevenlabs/scripts/elevenlabs_connector.js";
-import ExampleTTSConnector from "./example_tts_connector.js";
 import { localize } from "./libs/functions.js";
 import TalkingActorsConstants from "./constants.js";
 import { ReadAloudEnricher } from "./enrichers/read-aloud-enricher.js";
@@ -27,6 +25,8 @@ class ACDTalkingActors {
     logger = null;
     chatProcessor = null;
     contextMenu = null;
+
+    ttsConnectorCollection = [];
 
     get id() {
         return ACDTalkingActors.MODULE_ID;
@@ -52,7 +52,19 @@ class ACDTalkingActors {
     }
 
     registerTtsConnector(connector) {
-        this.ttsConnector = connector;
+        if (!connector || !connector.id) {
+            this.logger.error("Invalid TTS Connector registration attempt:", connector);
+            return;
+        }
+
+        if (this.ttsConnectorCollection.find(c => c.id === connector.id)) {
+            this.logger.warn(`TTS Connector with id ${connector.id} is already registered. Skipping duplicate registration.`);
+            return;
+        }
+
+        this.ttsConnectorCollection.push(connector);
+        this.logger.info(`Registered ${connector.label} as TTS Connector.`);
+
     }
 
     init() {
@@ -61,7 +73,19 @@ class ACDTalkingActors {
 
         Hooks.callAll(`acdTalkingActors.registerTtsConnector`, this, this.logger);
 
+        if (this.ttsConnectorCollection.length === 0) {
+            this.logger.warn("No TTS connectors registered.");
+            return;
+        }   
+        
+
         this.registerSettings();
+
+        const activeConnectorId = game.settings.get(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.ACTIVE_CONNECTOR);
+
+        this.ttsConnector = this.ttsConnectorCollection.find(c => c.id === activeConnectorId) || this.ttsConnectorCollection[0];
+
+        this.logger.info(`Using ${this.ttsConnector.label} as active TTS Connector.`);
 
         if (!this.ttsConnector) {
             return;
@@ -221,6 +245,7 @@ class ACDTalkingActors {
     registerSettings() {
         if (!game?.settings) return;
         try {
+
             game.settings.register(TalkingActorsConstants.MODULE, "debug", {
                 name: "ACD Talking Actors | Debug",
                 hint: "Enable debug logging for the module",
@@ -229,6 +254,17 @@ class ACDTalkingActors {
                 default: false,
                 type: Boolean,
                 onChange: value => { game.acdTalkingActors.ttsConnector.init(); },
+            });
+
+            game.settings.register(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.ACTIVE_CONNECTOR, {
+                name: "Active TTS Connector",
+                hint: "Select the active Text-to-Speech connector",
+                scope: "client",
+                config: true,
+                default: false,
+                type: String,
+                choices: this.connectorChoices,
+                requiresReload: true,
             });
 
             game.settings.register(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.ALLOW_USERS, {
@@ -284,6 +320,14 @@ class ACDTalkingActors {
         }
     }
 
+    get connectorChoices() {
+        let connectorChoices = {};
+        this.ttsConnectorCollection.forEach(m => {
+            connectorChoices[m.id] = m.label;
+        });
+        return connectorChoices;
+    }
+    
     openVoiceEditor(actors) {
         if (!actors || actors.length == 0) return;
 

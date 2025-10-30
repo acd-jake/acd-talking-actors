@@ -39,3 +39,7 @@ export default class ExampleTTSConnector extends TTSConnectorInterface {
         return null;
     }
 }
+
+Hooks.on("acdTalkingActors.registerTtsConnector", (mainModule, logger) => {
+    mainModule.registerTtsConnector(new ExampleTTSConnector(mainModule, logger));
+});

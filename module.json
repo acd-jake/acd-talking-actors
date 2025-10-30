@@ -19,35 +19,18 @@
   }
   ],
   "styles": [
-    "styles/context-menu.min.css"
+    "styles/context-menu.min.css",
+    "styles/ta-elevenlabs-styles.css"
   ],
   "esmodules": [
-    "scripts/main.js"
+    "scripts/main.js",
+    "scripts/connectors/elevenlabs/elevenlabs_connector.js"
   ],
   "scripts": [
     "scripts/libs/context-menu.min.js"
   ],
-  "packFolders": [
-    {
-      "name": "TA Macros",
-      "packs": [
-        "talking-actors"
-      ]
-    }
-  ],
-  "packs": [
-    {
-      "name": "talking-actors",
-      "label": "Talking Actors Macros",
-      "path": "packs/talking-actors.db",
-      "type": "Macro",
-      "ownership": {
-        "PLAYER": "OBSERVER"
-      }
-    }
-  ],
   "socket": true,
-  "description": "Selectable and adjustable voices for FoundryVTT actors through Elevenlabs integration.\\nSimply configure the voice for an actor and use the /talk chat command in the chat to hear him talk.\\nAn Elevenlabs subscription is required for the API Key.",
+  "description": "Enhances your tabletop experience by enabling actors and narrators to 'talk', with support for text-to-speech (TTS) integrationAn Elevenlabs subscription is required for the API Key.",
   "authors": [
     {
       "name": "Acd-Jake",
