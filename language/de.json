@@ -73,8 +73,8 @@
             "SimilarityBoost": "Similarity Boost",
             "Stability": "Stability",
             "Style": "Style",
-            "Model": "Einstellungen zum Sprachmodell",
-            "ModelLabel": "Sprachmodell",
+            "Model": "Einstellungen zum Sprachsynthese-Modell",
+            "ModelLabel": "Modell",
             "Language": "Sprache"
         },
         "SoundEffects": {

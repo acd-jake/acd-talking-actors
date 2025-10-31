@@ -271,7 +271,6 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
         }
 
         if (response.status !== 200) {
-            this.logger.error(`TTS request failed with status ${response.status}, detail: ${response.detail?.message || 'No additional information.'}`);
             this._speaking = false;
             return null;
         }

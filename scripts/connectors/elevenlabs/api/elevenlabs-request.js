@@ -20,22 +20,31 @@ export class ElevenlabsRequest {
     };
 
     async fetchJson(command) {
-        return await fetch(`${this.api_url}${command}`, {
-            headers: {
-                'accept': 'application/json',
-                'xi-api-key': this.api_key
-            }
-        }).then(response => response.text());
-    };
-
-    async fetchResponse(command) {
-        return await fetch(`${this.api_url}${command}`, {
+        const response =await fetch(`${this.api_url}${command}`, {
             headers: {
                 'accept': 'application/json',
                 'xi-api-key': this.api_key
             }
         });
+
+        this.checkResponseStatus(response);
+    
+        return await response.text();
+    };
+
+    async fetchResponse(command) {
+        const response = await fetch(`${this.api_url}${command}`, {
+            headers: {
+                'accept': 'application/json',
+                'xi-api-key': this.api_key
+            }
+        });
+
+        this.checkResponseStatus(response);
+        
+        return response;
     }
+
     async postData(command, acceptType, body) {
         let response = await fetch(`${this.api_url}${command}`, {
             method: 'POST',
@@ -46,7 +55,18 @@ export class ElevenlabsRequest {
             },
             body: body
         });
+
+        this.checkResponseStatus(response);
+
         return response;
     }
-}
 
+    checkResponseStatus(response) {
+        if (response.status !== 200 && response.status !== 201) {
+            this.logger.error(`TTS request failed with status ${response.status}, detail: ${response.detail?.message || 'No additional information.'}`);
+            this._speaking = false;
+            return false;
+        }
+        return true;
+    }
+}

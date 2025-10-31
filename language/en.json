@@ -73,7 +73,10 @@
             "Settings": "Voice Settings",
             "SimilarityBoost": "Similarity Boost",
             "Stability": "Stability",
-            "Style": "Style"
+            "Style": "Style",
+            "Model": "Speech Synthesis Model Settings",
+            "ModelLabel": "Model",
+            "Language": "Language"
         },
         "SoundEffects": {
             "dialog.title": "Create Sound Effects",
