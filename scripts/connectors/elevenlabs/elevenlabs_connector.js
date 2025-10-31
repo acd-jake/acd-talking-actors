@@ -257,11 +257,11 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
         const modelId = this.retrieveModelId(actor);
         const languageId = this.retrieveLanguageId(actor, modelId);
 
-        let container;
+        let response;
         try {
-            container = await new api.TextToSpeechRequest(this, voiceId, modelId, languageId, text, settings).fetch();
+            response = await new api.TextToSpeechRequest(this, voiceId, modelId, languageId, text, settings).fetch();
 
-            if (!container || !container.body || typeof container.body.getReader !== "function") {
+            if (!response || !response.body || typeof response.body.getReader !== "function") {
                 throw new Error("Invalid stream container received from TextToSpeechRequest.");
             }
         } catch (error) {
@@ -270,17 +270,17 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
             return null;
         }
 
-        if (container.status !== 200) {
-            this.logger.error(`TTS request failed with status ${container.status}`);
+        if (response.status !== 200) {
+            this.logger.error(`TTS request failed with status ${response.status}, detail: ${response.detail?.message || 'No additional information.'}`);
             this._speaking = false;
             return null;
         }
 
-        let historyItemId = container.headers.get("history-item-id");
+        let historyItemId = response.headers.get("history-item-id");
 
         this.logger.debug("TTS history item ID:", historyItemId);
 
-        let chunks = await this.readChunks(container);
+        let chunks = await this.readChunks(response);
 
         // Emit audio chunks to socket for playback or further processing
         game.socket.emit('module.' + this.mainModule.id, {
