@@ -2,7 +2,7 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/acd-jake/acd-talking-actors?display_name=tag&style=for-the-badge&label=Latest%20Release)
 
-![Latest Release Download Count](https://img.shields.io/github/downloads/acd-jake/acd-talking-actors/latest/module.zip?color=2b82fc&label=DOWNLOADS&style=for-the-badge)
+![Latest Release Download Count](https://img.shields.io/github/downloads/acd-jake/acd-talking-actors/latest/module.zip?color=2b82fc&label=LATEST%20VERSION%20DOWNLOADS&style=for-the-badge)
 
 ![Foundry Core Compatible Version](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2Facd-jake%2Facd-talking-actors%2Frefs%2Fheads%2Fmain%2Fmodule.json&label=Foundry%20Version&query=$.compatibility.verified&colorB=orange&style=for-the-badge)
 
