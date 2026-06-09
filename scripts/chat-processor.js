@@ -274,9 +274,16 @@ export class ChatProcessor {
             flavor: flavor,
             user: chatData.user,
             speaker: chatData.speaker,
-            type: chatMessageType,
             content: messageText,
         };
+
+        if (game.data.release.generation < 14) {
+            messageData.type = chatMessageType;
+        }
+        else
+        {
+            messageData.style = chatMessageType;
+        }
         return ChatMessage.create(messageData, { chatBubble: true });
     }
 

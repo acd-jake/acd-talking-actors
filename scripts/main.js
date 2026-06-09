@@ -106,7 +106,9 @@ class ACDTalkingActors {
         this.registerTextEditorEnrichers();
 
         Hooks.on("chatMessage", (chatlog, messageText, chatData) => {
-            let result = this.chatProcessor.processChatMessage(chatlog, messageText, chatData);
+
+            let chatContent = messageText.match(`^<p>(.+)</p>$`)
+            let result = this.chatProcessor.processChatMessage(chatlog, chatContent ? chatContent[1] : messageText, chatData);
             return result;
         });
 
@@ -208,7 +210,7 @@ class ACDTalkingActors {
         } catch (error) {
             this.logger.error("Failed to initialize generic enrichers\n", error);
         }
-        loadTemplates([TalkingActorsConstants.PATHS.TEMPLATES + 'readaloud-table.hbs']);
+        foundry.applications.handlebars.loadTemplates([TalkingActorsConstants.PATHS.TEMPLATES + 'readaloud-table.hbs']);
     }
 
     ready() {
@@ -379,7 +381,7 @@ class ACDTalkingActors {
     }
 
     async showTokenHudReadAloudDialog(event, data) {
-        const myContent = await renderTemplate(TalkingActorsConstants.PATHS.TEMPLATES + "tokenhud-dialog.hbs", data);
+        const myContent = await foundry.applications.handlebars.renderTemplate(TalkingActorsConstants.PATHS.TEMPLATES + "tokenhud-dialog.hbs", data);
 
         new Dialog({
             title: game.i18n.localize("acd.ta.TokenHud.dialog.title"),
