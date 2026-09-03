@@ -264,10 +264,6 @@ class ACDTalkingActors {
     }
 
     injectTokenHudButtons(app, hudHtml, data) {
-        if (!app.object.document.actorLink) {
-            return;
-        }
-
         let button = $(`<div class="control-icon talkingactors" data-tooltip="${localize("acd.ta.TokenHud.dialog.title")}"><i class="fas fa-comments"></i></div>`);
 
         // Find all elements with the class name '.col.left' in hudHtml and append the button after the last one
