@@ -42,10 +42,20 @@ export class SpeakerResolver {
         }
 
         // otherwise get the speaking actor from the chat data
+        // first try to get the actor from the token, when the token is not linked to an actor
+        if (!speakerActor && chatData?.speaker?.token) {
+                let speakertoken = game.scenes.current.tokens.get(chatData.speaker.token);
+                if (speakertoken && !speakertoken.actorLink) {
+                    speakerActor = speakertoken.actor;
+                }
+            }
+            
+        // otherwise try to get the actor from the actor id in the chat data
         if (!speakerActor && chatData?.speaker?.actor) {
             speakerActor = game.actors.get(chatData.speaker.actor);
         }
         return speakerActor;
+
     }
 
 
