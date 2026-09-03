@@ -24,12 +24,31 @@ export class SpeakerResolver {
     }
 
     static findSpeakerActorById(actorId) {
-        let speakerActor = game.actors.find((a) => a._id == actorId);
+        if (!actorId) return null;
+
+        let speakerActor = game.actors.get(actorId)
+            ?? game.actors.find((a) => a.id == actorId || a._id == actorId);
 
         if (!speakerActor) {
-            speakerActor = game.actors.find((a) => a.name == actorId);
+            speakerActor = this.findUniqueActorByName(actorId);
         }
         return speakerActor;
+    }
+
+    static findUniqueActorByName(actorName) {
+        if (!actorName) return null;
+
+        const matchingActors = game.actors.filter((a) => a.name == actorName);
+        return matchingActors.length === 1 ? matchingActors[0] : null;
+    }
+
+    static findSpeakerActorByTokenId(tokenId) {
+        if (!tokenId || !canvas?.tokens) return null;
+
+        const token = canvas.tokens.get(tokenId)
+            ?? canvas.tokens.placeables.find((t) => t.id == tokenId || t.document?.id == tokenId);
+
+        return token?.actor ?? token?.document?.actor ?? null;
     }
 
     static findSpeakerActorByChatData(chatData) {
@@ -42,8 +61,16 @@ export class SpeakerResolver {
         }
 
         // otherwise get the speaking actor from the chat data
+        if (!speakerActor && chatData?.speaker?.token) {
+            speakerActor = this.findSpeakerActorByTokenId(chatData.speaker.token);
+        }
+
         if (!speakerActor && chatData?.speaker?.actor) {
-            speakerActor = game.actors.get(chatData.speaker.actor);
+            speakerActor = this.findSpeakerActorById(chatData.speaker.actor);
+        }
+
+        if (!speakerActor && chatData?.speaker?.alias) {
+            speakerActor = this.findUniqueActorByName(chatData.speaker.alias);
         }
         return speakerActor;
     }
@@ -91,7 +118,7 @@ export class SpeakerResolver {
             && game.ConversationHud.activeConversation.activeParticipant != -1) {
             let speakername = game.ConversationHud.activeConversation.participants[game.ConversationHud.activeConversation.activeParticipant].name;
 
-            return game.actors.find((t) => t.name == speakername);
+            return this.findUniqueActorByName(speakername);
         }
         return null;
     }
