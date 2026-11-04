@@ -12,10 +12,22 @@
 
 import { ELEVENLABS_CONSTANTS, ELEVENLABS_FLAGS } from "../constants.js";
 
-export class VoiceSettingsApp extends Application {
+export class VoiceSettingsApp extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
 
     static flag = "elevenlabs-voiceSettings";
     static moduleKey = "acd-talking-actors";
+
+    static DEFAULT_OPTIONS = {
+        id: "changeVoiceSettings",
+        tag: "div",
+        classes: ["themed", "theme-light"],
+        window: { title: "acd.ta.VoiceSettings.Title", resizable: true },
+        position: { width: 800 }
+    };
+
+    static PARTS = {
+        content: { template: ELEVENLABS_CONSTANTS.TEMPLATEDIR + "voice_settings.hbs" }
+    };
 
     constructor(connector, actors, options = {}) {
         super(options);
@@ -96,18 +108,7 @@ export class VoiceSettingsApp extends Application {
         return settings;
     }
 
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            id: "changeVoiceSettings",
-            title: game.i18n.localize("acd.ta.VoiceSettings.Title"),
-            template: ELEVENLABS_CONSTANTS.TEMPLATEDIR + "voice_settings.hbs",
-            width: 800,
-            popOut: true
-        });
-    }
-
-    getData(options) {
-        let dispOptions = this.requestoptions = this.baseoptions;
+    async _prepareContext(options) {
         let currentSettings = this.getCurrentVoiceSettings();
         
         return {
@@ -126,8 +127,9 @@ export class VoiceSettingsApp extends Application {
         };
     }
 
-    activateListeners(html) {
-        super.activateListeners(html);
+    async _onRender(context, options) {
+        await super._onRender(context, options);
+        const html = $(this.element);
         var that = this;
 
         $('.items-header .item-controls', html).click($.proxy(this.changeActors, this));
@@ -222,7 +224,7 @@ export class VoiceSettingsApp extends Application {
                 break;
             case 'clear':
                 this.actors = [];
-                this.render(true);
+                this.render({ force: true });
                 break;
         }
     }
@@ -233,7 +235,7 @@ export class VoiceSettingsApp extends Application {
             this.actors.splice(idx, 1);
         }
         $(`li[data-item-id="${id}"]`, this.element).remove();
-        this.render(true); // Need this in case the token has tools
+        this.render({ force: true });
         window.setTimeout(() => { this.setPosition({ height: 'auto' }); }, 100);
     }
 
@@ -257,7 +259,7 @@ export class VoiceSettingsApp extends Application {
         if (actors.length > 0)
             this.actors = this.actors.concat(actors);
 
-        this.render(true);
+        this.render({ force: true });
         window.setTimeout(() => { this.setPosition({ height: 'auto' }); }, 100);
     }
 }

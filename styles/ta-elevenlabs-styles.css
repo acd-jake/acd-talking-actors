@@ -118,6 +118,79 @@
     box-shadow: 0 0 10px #000;
     border: 1px solid #000;
     padding: 1px 8px;
+    margin: 2px 0;
+    font-weight: bold;
+}
+
+#changeVoiceSettings .ta-voice-settings .sheet .items-list .items-header {
+    border: 2px groove #eeede0;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+#changeVoiceSettings .ta-voice-settings .sheet .items-list .item .item-name h4 {
+    font-family: var(--font-primary, "Signika", sans-serif);
+    font-size: 13px;
+    font-weight: normal;
+    text-transform: none;
+}
+
+#changeVoiceSettings .ta-voice-settings .form-group > label {
+    font-size: 13px;
+}
+
+#changeVoiceSettings .ta-voice-settings .dialog-buttons button {
+    height: 30px;
+    margin: 0;
+}
+
+#changeVoiceSettings .window-content {
+    padding: 8px;
+    overflow: hidden;
+}
+
+#changeVoiceSettings .ta-voice-settings {
+    height: 100%;
+    gap: 8px;
+}
+
+#changeVoiceSettings .ta-voice-settings form {
+    flex: 1;
+    min-height: 0;
+}
+
+#changeVoiceSettings .ta-voice-settings .form-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0;
+}
+
+#changeVoiceSettings .ta-voice-settings .form-group > label {
+    flex: 0 0 140px;
+}
+
+#changeVoiceSettings .ta-voice-settings .form-group > label[id$="_label"] {
+    flex: 0 0 50px;
+    text-align: right;
+}
+
+#changeVoiceSettings .ta-voice-settings .form-group select,
+#changeVoiceSettings .ta-voice-settings .form-group input[type="range"] {
+    flex: 1;
+}
+
+#changeVoiceSettings .ta-voice-settings .dialog-buttons {
+    flex: 0 0 auto;
+    gap: 8px;
+}
+
+#changeVoiceSettings .ta-voice-settings form > .flexrow {
+    align-items: flex-start;
+}
+
+#changeVoiceSettings .ta-voice-settings .sheet {
+    display: block;
 }
 
 #ta-create-soundeffect {

@@ -163,15 +163,16 @@ class ACDTalkingActors {
         }
 
         const voiceSettingsContextOption = {
-            name: 'acd.ta.controls.button.title',
+            label: 'acd.ta.controls.button.title',
             icon: '<i class="fas fa-comment"></i>',
-            condition: () => this.isModuleAccessible(),
-            callback: async (entry) => {
-                this.onActorContextOptionClick(entry);
+            visible: () => this.isModuleAccessible(),
+            onClick: async (event, target) => {
+                const el = target ?? event?.currentTarget ?? event?.target;
+                this.onActorContextOptionClick(el?.closest?.('[data-entry-id]') ?? el);
             }
         };
 
-        if (!entries.find(e => e.name === voiceSettingsContextOption.name)) {
+        if (!entries.find(e => (e.label ?? e.name) === voiceSettingsContextOption.label)) {
             entries.push(voiceSettingsContextOption);
         }
     }

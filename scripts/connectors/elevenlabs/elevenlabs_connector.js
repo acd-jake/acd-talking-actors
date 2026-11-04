@@ -168,7 +168,7 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
 
     async openVoiceSettingsApp(actors) {
         const app = new VoiceSettingsApp(this, actors);
-        app.render(true);
+        app.render({ force: true });
     }
 
     getAvailableVoices() {
