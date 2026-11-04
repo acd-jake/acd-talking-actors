@@ -18,6 +18,7 @@ acd-talking-actors is a FoundryVTT module that brings immersive, AI-powered voic
 
 - Assign and configure voices for actors using the Voice Settings dialog
 - Use `/talk` chat command to make selected actors speak with their configured or overridden voice
+- Start the text with a stage direction in parentheses, e.g. `/talk (angry and shouting) Get out!`, to steer the delivery; the direction is removed from the audio
 - Optional integration with [Yendors Scene Actors](https://foundryvtt.com/packages/yendors-scene-actors) and [Conversation Hud](https://foundryvtt.com/packages/conversation-hud)
 - Read-aloud support for FoundryVTT journals, with macro insertion and flexible voice selection
 - Token HUD button for entering and reading aloud custom text

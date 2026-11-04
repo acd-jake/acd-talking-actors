@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-04
+
+### Added
+
+- Stage directions for speech: `/talk (angry and shouting) Get out of my sight!`. The direction is spoken by ElevenLabs to set the tone, then cut from the audio at the following pause, and shown in small italics above the message. Replay also omits it.
+
 ## [1.2.0] - 2026-11-04
 
 ### Added
