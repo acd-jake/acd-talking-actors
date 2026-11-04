@@ -4,11 +4,10 @@
 
 import { localize } from "./libs/functions.js";
 import TalkingActorsConstants from "./constants.js";
-import { ReadAloudEnricher } from "./enrichers/read-aloud-enricher.js";
-import { ReadAloudNarratorEnricher } from "./enrichers/read-aloud-narrator-enricher.js";
-import { ReadAloudActorEnricher } from "./enrichers/read-aloud-actor-enricher.js";
 import Logger from "./libs/logger.js";
 import { ChatProcessor } from "./chat-processor.js";
+import { TalkingActorsSettings } from "./module-settings.js";
+import { ReadAloudController } from "./read-aloud-controller.js";
 
 class ACDTalkingActors {
     static MODULE_ID = "acd-talking-actors";
@@ -24,7 +23,8 @@ class ACDTalkingActors {
     ttsConnector = null;
     logger = null;
     chatProcessor = null;
-    contextMenu = null;
+    settingsManager = null;
+    readAloudController = null;
 
     ttsConnectorCollection = [];
 
@@ -38,12 +38,12 @@ class ACDTalkingActors {
         this._prefix = `[${ACDTalkingActors.MODULE_ID}]`;
 
         this.logger = new Logger(this);
-
-
+        this.settingsManager = new TalkingActorsSettings(this);
+        this.readAloudController = new ReadAloudController(this);
 
         Hooks.once("ready", () => {
             game.socket.on('module.' + ACDTalkingActors.MODULE_ID, ({ container, historyItemId, text }) => {
-                this.ttsConnector.playSound(container)
+                this.ttsConnector.playSound(container);
             });
 
             this.ready();
@@ -79,7 +79,7 @@ class ACDTalkingActors {
         }   
         
 
-        this.registerSettings();
+        this.settingsManager.register();
 
         const activeConnectorId = game.settings.get(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.ACTIVE_CONNECTOR);
 
@@ -103,7 +103,7 @@ class ACDTalkingActors {
         this.chatProcessor = new ChatProcessor(this.ttsConnector, this.logger);
 
         //add generic enrichers to TextEditor
-        this.registerTextEditorEnrichers();
+        this.readAloudController.registerTextEditorEnrichers();
 
         Hooks.on("chatMessage", (chatlog, messageText, chatData) => {
 
@@ -112,19 +112,19 @@ class ACDTalkingActors {
             return result;
         });
 
-        let that = this;
-
-        $(document).on('click', '.acd-ta-replay', async function () { await that.ttsConnector.replaySpeech($(this).data('item-id')); })
+        $(document).on('click', '.acd-ta-replay', async event => {
+            await this.ttsConnector.replaySpeech($(event.currentTarget).data('item-id'));
+        });
 
         Hooks.on("getSceneControlButtons", (controls) => this.injectControlToolButtons(controls));
-        Hooks.on('renderSettingsConfig', (app, _html) => this.injectSettingsHeaderLabel(app, that));
+        Hooks.on('renderSettingsConfig', app => this.injectSettingsHeaderLabel(app));
         Hooks.on('getActorContextOptions', (app, entries) => this.injectActorContextOptions(app, entries));
     }
         
 
-    injectSettingsHeaderLabel(app, that) {
+    injectSettingsHeaderLabel(app) {
         const moduleTab = app.form.querySelector('.tab[data-tab=acd-talking-actors]');
-        moduleTab.querySelector('input[name=acd-talking-actors\\.autoInCharacterTalk]').closest('div.form-group').after(this.createTitleNode(`${that.ttsConnector.label} Settings`));
+        moduleTab.querySelector('input[name=acd-talking-actors\\.autoInCharacterTalk]').closest('div.form-group').after(this.createTitleNode(`${this.ttsConnector.label} Settings`));
     }
 
     createTitleNode (text) {
@@ -201,16 +201,7 @@ class ACDTalkingActors {
     }
 
     registerTextEditorEnrichers() {
-        try {
-            CONFIG.TextEditor.enrichers.push(
-                new ReadAloudEnricher(),
-                new ReadAloudActorEnricher(),
-                new ReadAloudNarratorEnricher()
-            );
-        } catch (error) {
-            this.logger.error("Failed to initialize generic enrichers\n", error);
-        }
-        foundry.applications.handlebars.loadTemplates([TalkingActorsConstants.PATHS.TEMPLATES + 'readaloud-table.hbs']);
+        this.readAloudController.registerTextEditorEnrichers();
     }
 
     ready() {
@@ -223,31 +214,20 @@ class ACDTalkingActors {
             return;
         }
 
-        this.initializeJournalEntryContextMenu();
+        this.readAloudController.registerJournalSelectionContextMenu();
 
         if (game.user.isGM) {
-            Hooks.on("renderTokenHUD", this.injectTokenHudButtons.bind(this));
+            Hooks.on("renderTokenHUD", (app, hudHtml, data) => {
+                this.readAloudController.injectTokenHudButtons(app, hudHtml, data);
+            });
         }
 
         if (this.isModuleAccessible()) {
             Hooks.on('getActorSheetHeaderButtons', this.injectActorSheetHeaderButton.bind(this));
         }
 
-        this.createJournalContextMenu();
+        this.readAloudController.createJournalContextMenu();
 
-    }
-
-    initializeJournalEntryContextMenu() {
-        if (game.settings.get(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.ENABLE_SELECTION_CONTEXT_MENU)) {
-            document.addEventListener('contextmenu', (ev) => {
-                if (ev.target.classList.contains('journal-entry-pages') ||
-                    $(ev.target).parents('div.journal-entry-pages').length ||
-                    ev.target.classList.contains('editor-content') ||
-                    $(ev.target).parents('div.editor-content').length) {
-                    this.showContextMenu(ev);
-                }
-            });
-        }
     }
 
     injectActorSheetHeaderButton(sheet, buttons) {
@@ -263,103 +243,8 @@ class ACDTalkingActors {
         });
     }
 
-    injectTokenHudButtons(app, hudHtml, data) {
-        let button = $(`<div class="control-icon talkingactors" data-tooltip="${localize("acd.ta.TokenHud.dialog.title")}"><i class="fas fa-comments"></i></div>`);
-
-        // Find all elements with the class name '.col.left' in hudHtml and append the button after the last one
-        const leftCols = hudHtml.getElementsByClassName ? hudHtml.getElementsByClassName('col left') : [];
-        if (leftCols.length > 0) {
-            const lastCol = leftCols[leftCols.length - 1];
-            if (lastCol && lastCol.parentNode) {
-                lastCol.append(button[0] || button);
-            }
-        } else {
-            // fallback: append to firstChild as before
-            hudHtml.firstChild.append(button[0] || button);
-        }
-        button.click(async (event) => { // getElementsByClassName("i.fa-comments").click(async (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            await this.showTokenHudReadAloudDialog(event, data);
-        });
-    }
-
     registerSettings() {
-        if (!game?.settings) return;
-        try {
-
-            game.settings.register(TalkingActorsConstants.MODULE, "debug", {
-                name: "ACD Talking Actors | Debug",
-                hint: "Enable debug logging for the module",
-                scope: "client",
-                config: false,
-                default: false,
-                type: Boolean,
-                onChange: value => { game.acdTalkingActors.ttsConnector.init(); },
-            });
-
-            game.settings.register(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.ACTIVE_CONNECTOR, {
-                name: "Active TTS Connector",
-                hint: "Select the active Text-to-Speech connector",
-                scope: "client",
-                config: true,
-                default: false,
-                type: String,
-                choices: this.connectorChoices,
-                requiresReload: true,
-            });
-
-            game.settings.register(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.ALLOW_USERS, {
-                name: 'acd.ta.settings.AllowUsers',
-                hint: 'acd.ta.settings.AllowUsersHint',
-                config: true,
-                scope: 'world',
-                type: Boolean,
-                default: true,
-                onChange: value => { game.acdTalkingActors.ttsConnector.init(); },
-            });
-
-            game.settings.register(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.NARRATORACTOR, {
-                name: 'acd.ta.settings.NarratorActor',
-                hint: 'acd.ta.settings.NarratorActorHint',
-                scope: "world",
-                config: true,
-                type: String,
-                onChange: value => { game.acdTalkingActors.ttsConnector.init(); },
-                default: "",
-            });
-
-            game.settings.register(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.ENABLE_SELECTION_CONTEXT_MENU, {
-                name: 'acd.ta.settings.EnableSelectionContextMenu',
-                hint: 'acd.ta.settings.EnableSelectionContextMenuHint',
-                config: true,
-                scope: 'world',
-                type: Boolean,
-                default: false,
-            });
-
-
-            game.settings.register(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.POST_TO_CHAT, {
-                name: 'acd.ta.settings.PostTextToChat',
-                hint: 'acd.ta.settings.PostTextToChatHint',
-                config: true,
-                scope: 'world',
-                type: Boolean,
-                default: true,
-            });
-
-            game.settings.register(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.AUTO_IN_CHARACTER_TALK, {
-                name: 'acd.ta.settings.AutoInCharacterTalk',
-                hint: 'acd.ta.settings.AutoInCharacterTalkHint',
-                config: true,
-                scope: 'world',
-                type: Boolean,
-                default: true,
-            });
-
-        } catch (err) {
-            this.logger.error("Settings registration skipped or failed:", err);
-        }
+        this.settingsManager.register();
     }
 
     get connectorChoices() {
@@ -376,156 +261,20 @@ class ACDTalkingActors {
         this.ttsConnector.openVoiceSettingsApp(actors);
     }
 
-    async showTokenHudReadAloudDialog(event, data) {
-        const myContent = await foundry.applications.handlebars.renderTemplate(TalkingActorsConstants.PATHS.TEMPLATES + "tokenhud-dialog.hbs", data);
-
-        new Dialog({
-            title: game.i18n.localize("acd.ta.TokenHud.dialog.title"),
-            content: myContent,
-            buttons: {
-                readaloud: {
-                    icon: '<i class="fas fa-comments"></i>',
-                    label: localize("acd.ta.TokenHud.withChat"),
-                    callback: (html) => this.readAloudCallback(html, true)
-                },
-                readAloudWithoutChat: {
-                    icon: '<i class="fas fa-comments"></i>',
-                    label: localize("acd.ta.TokenHud.withoutChat"),
-                    callback: (html) => this.readAloudCallback(html, false)
-                },
-                close: {
-                    icon: '<i class="fas fa-cancel"></i>',
-                    label: game.i18n.localize("Cancel"),
-                },
-            },
-            default: "close",
-        }).render(true);
-    }
-    async readAloudCurrentActor(content, postToChat = true, options = {}) {
-        // Implementation for reading aloud content with the current actor's voice
-        let command = this.createChatCommand(postToChat);
-
-        content = `/${command} ${content.replace(/\\n/g, '<br>')}`;
-
-        ui.chat.processMessage(content);
+    showTokenHudReadAloudDialog(_event, data) {
+        return this.readAloudController.showTokenHudReadAloudDialog(data);
     }
 
-    async readAloudNarrator(content, options = {}) {
-        // Implementation for reading aloud content with the current actor's voice
-        let command = "narrate";
-
-        content = `/${command} ${content.replace(/\\n/g, '<br>')}`;
-
-        ui.chat.processMessage(content);
+    readAloudCurrentActor(...args) {
+        return this.readAloudController.readAloudCurrentActor(...args);
     }
 
-    async readAloud(content, postToChat = true, options = {}) {
-        // Implementation for reading aloud content with the given actors voice
-        let narrator = options.narrator;
-        if (!narrator) {
-            this.readAloudNarrator(content, options);
-            return
-        }
-
-        let command = this.createChatCommand(postToChat);
-        content = `/${command} {${narrator}} ${content.replace(/\\n/g, '<br>')}`;
-
-        ui.chat.processMessage(content);
+    readAloudNarrator(...args) {
+        return this.readAloudController.readAloudNarrator(...args);
     }
 
-    async readAloudCallback(html, postToChat) {
-        let message = html.find("[name='readaloadtext']").first().val();
-        let speaker = html.find("input[name='speaker']:checked").val();
-        if (speaker == "narrator") {
-            this.readAloud(message, postToChat, { inCharacter: false });
-        } else {
-            this.readAloudCurrentActor(message, postToChat);
-        }
-    }
-
-    createChatCommand(postToChat) {
-        return postToChat ? "talk" : "talk-s";
-    }
-
-    async showContextMenu(event) {
-        const time = this.contextMenu.isOpen() ? 100 : 0;
-        this.contextMenu.hide();
-        setTimeout(() => {
-            this.contextMenu.show(event.pageX, event.pageY);
-        }, time);
-    }
-
-    createJournalContextMenu() {
-        this.contextMenu = new ContextMenuNT({
-            theme: 'default',
-            items: [
-                {
-                    icon: 'comment',
-                    name: game.i18n.localize("acd.ta.controls.readAloud"),
-                    action: () => {
-                        const selection = this.getSelectionText();
-                        if (selection)
-                            this.readAloud(selection, true);
-                        this.contextMenu.hide();
-                    },
-                },
-                {
-                    icon: 'comment',
-                    name: game.i18n.localize("acd.ta.controls.readAloudWithoutChat"),
-                    action: () => {
-                        const selection = this.getSelectionText();
-                        if (selection)
-                            this.readAloud(selection, false);
-                        this.contextMenu.hide();
-                    },
-                },
-                {
-                    icon: 'comment',
-                    name: game.i18n.localize("acd.ta.controls.readAloudCurrentActor"),
-                    action: () => {
-                        const selection = this.getSelectionText();
-                        if (selection)
-                            this.readAloudCurrentActor(selection, true);
-                        this.contextMenu.hide();
-                    },
-                },
-                {
-                    icon: 'comment',
-                    name: game.i18n.localize("acd.ta.controls.readAloudCurrentActorWithoutChat"),
-                    action: () => {
-                        const selection = this.getSelectionText();
-                        if (selection)
-                            this.readAloudCurrentActor(selection, false);
-                        this.contextMenu.hide();
-                    },
-                },
-                {
-                    icon: 'cancel',
-                    name: game.i18n.localize("acd.ta.controls.cancel"),
-                    action: () => {
-                        this.contextMenu.hide();
-                    },
-                },
-            ],
-        });
-    }
-
-    getSelectionText() {
-        let html = '';
-        const selection = window.getSelection();
-        if (selection?.rangeCount && !selection.isCollapsed) {
-            const fragments = selection.getRangeAt(0).cloneContents();
-            const size = fragments.childNodes.length;
-            for (let i = 0; i < size; i++) {
-                if (fragments.childNodes[i].nodeType == fragments.TEXT_NODE)
-                    html += fragments.childNodes[i].wholeText;
-                else
-                    html += fragments.childNodes[i].outerHTML;
-            }
-        }
-        if (!html) {
-        }
-        return html;
+    readAloud(...args) {
+        return this.readAloudController.readAloud(...args);
     }
 
 }

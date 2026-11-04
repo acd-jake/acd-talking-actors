@@ -63,9 +63,7 @@ export class ElevenlabsRequest {
 
     checkResponseStatus(response) {
         if (response.status !== 200 && response.status !== 201) {
-            this.logger.error(`TTS request failed with status ${response.status}, detail: ${response.detail?.message || 'No additional information.'}`);
-            this._speaking = false;
-            return false;
+            throw new Error(`ElevenLabs request failed with status ${response.status}: ${response.statusText || 'No additional information.'}`);
         }
         return true;
     }

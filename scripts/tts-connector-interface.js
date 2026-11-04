@@ -11,7 +11,6 @@
  */
 
 import { localize } from "./libs/functions.js";
-import Logger from "./libs/logger.js";
 
 /* eslint-disable no-unused-vars */
 export default class TTSConnectorInterface {
@@ -37,7 +36,6 @@ export default class TTSConnectorInterface {
         this._selectedVoice = null;
         this._volume = 1.0;
         this._speaking = false;
-        this.logger = new Logger(this);
     }
 
     get isMuted() {
@@ -166,24 +164,13 @@ export default class TTSConnectorInterface {
      * Voice & capabilities
      * ------------------------- */
 
-    /**
-     * Return available voices from the provider.
-     * @returns {Promise<Array<{ id: string, name?: string, lang?: string, gender?: string }>>}
-     */
-    async getAvailableVoices() {
+    /** Return the connector's cached voices using the common voice shape. */
+    getAvailableVoices() {
         throw new Error("getAvailableVoices must be implemented by subclass");
     }
 
-    /**
-     * Retrieve the provider-specific voice identifier for a given voice name.
-     *
-     * This method is intended to be overridden by subclasses. Implementations
-     * should perform any asynchronous lookup or mapping necessary and return the
-     * underlying voice ID string used by the TTS provider.
-     *
-     *  @returns {Promise<string>} A promise that resolves to the provider-specific voice identifier.
-     */
-    async getVoiceId(voiceName) {
+    /** Resolve a name against the cached voice catalog; this lookup must remain synchronous. */
+    getVoiceId(voiceName) {
         throw new Error("getVoiceId must be implemented by subclass");
     }
 

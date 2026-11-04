@@ -15,7 +15,7 @@ export default class ExampleTTSConnector extends TTSConnectorInterface {
         ];
     }
 
-    async getAvailableVoices() {
+    getAvailableVoices() {
         // Example: return a static list
         return [
             { id: "voice1", name: "Voice One", lang: "en", gender: "female" },

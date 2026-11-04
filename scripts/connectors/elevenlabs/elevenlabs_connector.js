@@ -3,7 +3,7 @@ import { ELEVENLABS_CONSTANTS, ELEVENLABS_FLAGS } from "./constants.js";
 import { VoiceSettingsApp } from "./apps/voice_settings_app.js";
 import * as api from "./api/_api.js";
 import { Mp3Utils } from "../../libs/mp3-utils.js";
-import { GenerateSoundEffectsApp } from "./apps/generate_sound_effects_app.js";
+import { SoundEffectsSidebarController } from "./apps/sound-effects-sidebar-controller.js";
 
 export default class ElevenlabsConnector extends TTSConnectorInterface {
 
@@ -12,11 +12,13 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
     playedSounds = [];
     contextMenu;
     _speaking = false;
+    soundEffectsSidebarController = null;
 
     models = [];
 
     constructor(mainModule, logger) {
         super(mainModule, logger);
+        this.soundEffectsSidebarController = new SoundEffectsSidebarController(this);
     }
 
     get id() {
@@ -103,30 +105,7 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
         this.registerAdditionalSettings();
         this.logger.debug("Initialization complete.");
 
-        Hooks.on("changeSidebarTab", (app) => {
-            if (!(app instanceof PlaylistDirectory)) {
-                return;
-            }
-
-            if ($('#ta-create-soundeffect').length == 0) {
-                this.injectCreateSoundEffectButton(app);
-            }
-        });
-    }
-
-    async injectCreateSoundEffectButton(app) {
-        $('#playlists').find('footer.directory-footer').append(
-            `<a class="ta-create-soundeffect" id="ta-create-soundeffect" data-tooltip="${game.i18n.localize("acd.ta.SoundEffects.createbuttonHint")}">` +
-            game.i18n.localize('acd.ta.SoundEffects.createbutton') +
-            '</a>'
-        );
-
-        $('#ta-create-soundeffect').click(async (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-
-            new GenerateSoundEffectsApp(this, logger).render(true);
-        });
+        this.soundEffectsSidebarController.register();
     }
     async initializeModels() {
         if (!this.hasApiKey("API key not set. Cannot fetch available models.")) {
@@ -153,7 +132,10 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
         this.logger.debug("Fetching available voices...");
         try {
             const remoteVoices = await new api.GetVoicesRequest(this).fetch();
-            this.availableVoices = remoteVoices;
+            this.availableVoices = remoteVoices.map(voice => ({
+                ...voice,
+                id: voice.voice_id ?? voice.id,
+            }));
 
             this.logger.debug("Available voices:", this.availableVoices);
         } catch (err) {
