@@ -116,7 +116,7 @@ class ACDTalkingActors {
         });
 
         $(document).on('click', '.acd-ta-replay', async event => {
-            await this.ttsConnector.replaySpeech($(event.currentTarget).data('item-id'));
+            await this.ttsConnector.replaySpeech($(event.currentTarget).data('item-id'), { hasDirection: $(event.currentTarget).data('direction') === true });
         });
 
         Hooks.on("getSceneControlButtons", (controls) => this.injectControlToolButtons(controls));

@@ -43,15 +43,19 @@ export class ChatProcessor {
             postToChat,
             chatData,
             messageText: commandData.text,
+            direction: commandData.direction,
             chatlog,
         });
 
         return false;
     }
 
-    async processAndPostMessage({ voiceId, speakerActor, postToChat, chatData, messageText, inCharacter, settings, chatlog }) {
+    async processAndPostMessage({ voiceId, speakerActor, postToChat, chatData, messageText, direction, inCharacter, settings, chatlog }) {
+        const directionHtml = direction
+            ? `<em class="acd-ta-direction" style="font-size: 0.85em;">${Handlebars.Utils.escapeExpression(direction)}</em><br>`
+            : "";
         if (!voiceId) {
-            return this.messagePublisher.postMessage(chatData, "", messageText, inCharacter);
+            return this.messagePublisher.postMessage(chatData, "", directionHtml + messageText, inCharacter);
         }
 
         const shouldPost = postToChat && game.settings.get(
@@ -63,7 +67,7 @@ export class ChatProcessor {
             ? this.messagePublisher.postMessage(
                 chatData,
                 localize("acd.ta.chat.textTalked"),
-                `<span class="acd-ta-talked">${messageText}</span>`,
+                `${directionHtml}<span class="acd-ta-talked">${messageText}</span>`,
                 inCharacter,
                 status ? { [TalkingActorsConstants.MODULE]: { speechStatus: status.snapshot() } } : null,
             ).then(message => {
@@ -72,6 +76,7 @@ export class ChatProcessor {
             })
             : null;
         const speechPromise = this.ttsConnector.textToSpeech(voiceId, speakerActor, messageText, settings, {
+            direction,
             onProgress: stage => (stage === "playing" ? status?.finish() : status?.update(stage)),
         }).then(
             id => {
@@ -87,7 +92,7 @@ export class ChatProcessor {
         if (chatMessagePromise) {
             const chatMessage = await chatMessagePromise;
             const historyItemId = await speechPromise;
-            await this.messagePublisher.addReplayControl(chatMessage, historyItemId);
+            await this.messagePublisher.addReplayControl(chatMessage, historyItemId, Boolean(direction));
             chatlog.updateMessage(chatMessage);
         }
     }

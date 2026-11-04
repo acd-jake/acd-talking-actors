@@ -23,9 +23,9 @@ export class ChatMessagePublisher {
         return ChatMessage.create(messageData, { chatBubble: true });
     }
 
-    async addReplayControl(chatMessage, historyItemId) {
+    async addReplayControl(chatMessage, historyItemId, hasDirection = false) {
         const replayControl = historyItemId
-            ? `<span class="acd-ta-replay" data-item-id="${historyItemId}"><i class="fa-solid fa-repeat"></i></span>`
+            ? `<span class="acd-ta-replay" data-item-id="${historyItemId}"${hasDirection ? ' data-direction="true"' : ""}><i class="fa-solid fa-repeat"></i></span>`
             : "";
         const flavor = `${localize("acd.ta.chat.textTalked")}${replayControl}`;
 

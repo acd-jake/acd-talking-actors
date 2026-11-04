@@ -4,6 +4,7 @@ import { VoiceSettingsApp } from "./apps/voice_settings_app.js";
 import * as api from "./api/_api.js";
 import { Mp3Utils } from "../../libs/mp3-utils.js";
 import { sendAudio } from "../../libs/audio-transfer.js";
+import { buildDirectedText, trimDirectionFromChunks } from "../../libs/direction-trimmer.js";
 import { SoundEffectsSidebarController } from "./apps/sound-effects-sidebar-controller.js";
 
 export default class ElevenlabsConnector extends TTSConnectorInterface {
@@ -216,7 +217,7 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
         return new api.GetVoiceSettingsRequest(this, voiceId).fetch();
     }
 
-    async textToSpeech(voiceId, actor, text, settings, { onProgress } = {}) {
+    async textToSpeech(voiceId, actor, text, settings, { onProgress, direction } = {}) {
         // Observers must never delay or break speech.
         const notify = stage => {
             try { Promise.resolve(onProgress?.(stage)).catch(() => {}); } catch { /* ignored */ }
@@ -248,7 +249,7 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
         let response;
         try {
             notify("preparing");
-            response = await new api.TextToSpeechRequest(this, voiceId, modelId, languageId, text, settings).fetch();
+            response = await new api.TextToSpeechRequest(this, voiceId, modelId, languageId, buildDirectedText(direction, text), settings).fetch();
 
             if (!response || !response.body || typeof response.body.getReader !== "function") {
                 throw new Error("Invalid stream container received from TextToSpeechRequest.");
@@ -270,6 +271,7 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
 
         notify("receiving");
         let chunks = await this.readChunks(response);
+        if (direction) chunks = await trimDirectionFromChunks(chunks, this.logger);
         notify("starting");
 
         sendAudio(game.socket, 'module.' + this.mainModule.id, chunks, { historyItemId, text })
@@ -379,10 +381,11 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
         }
     }
 
-    async replaySpeech(itemId) {
+    async replaySpeech(itemId, { hasDirection = false } = {}) {
         let container = await new api.GetAudioFromHistoryItemRequest(this, itemId).fetch();
 
         let chunks = await this.readChunks(container);
+        if (hasDirection) chunks = await trimDirectionFromChunks(chunks, this.logger);
         sendAudio(game.socket, 'module.' + this.mainModule.id, chunks, { historyItemId: itemId, text: "" })
             .catch(error => this.logger.warn("Failed to broadcast audio:", error));
 

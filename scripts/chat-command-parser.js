@@ -25,5 +25,11 @@ export function parseChatCommand(messageText, isAutoInCharacterTalkEnabled) {
 
     if (!isSupportedCommand) return null;
 
-    return { command, voiceName, actorIdentifier, text };
+    const directionMatch = text.match(/^\(([^()]+)\)\s*(.*)$/s);
+    if (directionMatch) {
+        const direction = directionMatch[1].trim();
+        return { command, voiceName, actorIdentifier, direction, text: directionMatch[2] };
+    }
+
+    return { command, voiceName, actorIdentifier, direction: null, text };
 }
