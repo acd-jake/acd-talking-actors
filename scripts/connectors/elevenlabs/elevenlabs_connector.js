@@ -3,6 +3,7 @@ import { ELEVENLABS_CONSTANTS, ELEVENLABS_FLAGS } from "./constants.js";
 import { VoiceSettingsApp } from "./apps/voice_settings_app.js";
 import * as api from "./api/_api.js";
 import { Mp3Utils } from "../../libs/mp3-utils.js";
+import { sendAudio } from "../../libs/audio-transfer.js";
 import { SoundEffectsSidebarController } from "./apps/sound-effects-sidebar-controller.js";
 
 export default class ElevenlabsConnector extends TTSConnectorInterface {
@@ -215,7 +216,12 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
         return new api.GetVoiceSettingsRequest(this, voiceId).fetch();
     }
 
-    async textToSpeech(voiceId, actor, text, settings) {
+    async textToSpeech(voiceId, actor, text, settings, { onProgress } = {}) {
+        // Observers must never delay or break speech.
+        const notify = stage => {
+            try { Promise.resolve(onProgress?.(stage)).catch(() => {}); } catch { /* ignored */ }
+        };
+
         if (this.isMuted) {
             this.logger.info("TTS is muted; skipping text-to-speech.");
             return null;
@@ -241,6 +247,7 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
 
         let response;
         try {
+            notify("preparing");
             response = await new api.TextToSpeechRequest(this, voiceId, modelId, languageId, text, settings).fetch();
 
             if (!response || !response.body || typeof response.body.getReader !== "function") {
@@ -261,16 +268,14 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
 
         this.logger.debug("TTS history item ID:", historyItemId);
 
+        notify("receiving");
         let chunks = await this.readChunks(response);
+        notify("starting");
 
-        // Emit audio chunks to socket for playback or further processing
-        game.socket.emit('module.' + this.mainModule.id, {
-            container: chunks,
-            historyItemId: historyItemId,
-            text: text
-        })
+        sendAudio(game.socket, 'module.' + this.mainModule.id, chunks, { historyItemId, text })
+            .catch(error => this.logger.warn("Failed to broadcast audio:", error));
 
-        this.playSound(chunks);
+        this.playSound(chunks, () => notify("playing"));
 
         return historyItemId;
     }
@@ -345,12 +350,13 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
         return chunks;
     }
 
-    async playSound(chunks) {
+    async playSound(chunks, onStarted) {
         let blob = new Blob(chunks, { type: 'audio/mpeg' })
         let url = window.URL.createObjectURL(blob)
         let sound = this.playAudio(url);
         let resolvedSound = Promise.resolve(sound);
         resolvedSound.then((soundInfo) => {
+            onStarted?.();
             console.log(soundInfo);
             this._speaking = false;
             this.logger.info("Finished playing sound.");
@@ -377,11 +383,8 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
         let container = await new api.GetAudioFromHistoryItemRequest(this, itemId).fetch();
 
         let chunks = await this.readChunks(container);
-        game.socket.emit('module.' + this.mainModule.id, {
-            container: chunks,
-            historyItemId: itemId,
-            text: ""
-        })
+        sendAudio(game.socket, 'module.' + this.mainModule.id, chunks, { historyItemId: itemId, text: "" })
+            .catch(error => this.logger.warn("Failed to broadcast audio:", error));
 
         this.playSound(chunks);
 

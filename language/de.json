@@ -100,6 +100,13 @@
             "walls": "Durch Wände begrenzt",
             "easing": "Lautstärke anpassen",
             "hidden": "Versteckt"
+        },
+        "speechStatus": {
+            "preparing": "Sprachausgabe wird vorbereitet",
+            "receiving": "Audio wird geladen",
+            "starting": "Sprachausgabe startet",
+            "failed": "Sprachausgabe fehlgeschlagen",
+            "elapsed": "{seconds}s vergangen"
         }
     }
 }

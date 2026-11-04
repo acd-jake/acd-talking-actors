@@ -17,6 +17,7 @@ export class ChatProcessor {
         this.logger = logger;
         this.voiceResolver = dependencies.voiceResolver ?? new ChatVoiceResolver(ttsConnector, logger);
         this.messagePublisher = dependencies.messagePublisher ?? new ChatMessagePublisher();
+        this.speechStatus = dependencies.speechStatus ?? null;
     }
 
     /** Returns true when Foundry should continue handling the message. */
@@ -53,24 +54,50 @@ export class ChatProcessor {
             return this.messagePublisher.postMessage(chatData, "", messageText, inCharacter);
         }
 
-        const chatMessagePromise = postToChat && game.settings.get(
+        const shouldPost = postToChat && game.settings.get(
             TalkingActorsConstants.MODULE,
             TalkingActorsConstants.SETTINGS.POST_TO_CHAT,
-        )
+        );
+        const status = shouldPost && !this.ttsConnector.isMuted ? this.startStatus() : null;
+        const chatMessagePromise = shouldPost
             ? this.messagePublisher.postMessage(
                 chatData,
                 localize("acd.ta.chat.textTalked"),
                 `<span class="acd-ta-talked">${messageText}</span>`,
                 inCharacter,
-            )
+                status ? { [TalkingActorsConstants.MODULE]: { speechStatus: status.snapshot() } } : null,
+            ).then(message => {
+                status?.attach(message);
+                return message;
+            })
             : null;
-        const speechPromise = this.ttsConnector.textToSpeech(voiceId, speakerActor, messageText, settings);
+        const speechPromise = this.ttsConnector.textToSpeech(voiceId, speakerActor, messageText, settings, {
+            onProgress: stage => (stage === "playing" ? status?.finish() : status?.update(stage)),
+        }).then(
+            id => {
+                status?.finish(id === null ? "skipped" : "complete");
+                return id;
+            },
+            error => {
+                status?.finish("failed");
+                throw error;
+            },
+        );
 
         if (chatMessagePromise) {
             const chatMessage = await chatMessagePromise;
             const historyItemId = await speechPromise;
             await this.messagePublisher.addReplayControl(chatMessage, historyItemId);
             chatlog.updateMessage(chatMessage);
+        }
+    }
+
+    startStatus() {
+        try {
+            return this.speechStatus?.start() ?? null;
+        } catch (error) {
+            this.logger.warn("Unable to display speech status:", error);
+            return null;
         }
     }
 }

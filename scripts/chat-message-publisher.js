@@ -1,7 +1,7 @@
 import { localize } from "./libs/functions.js";
 
 export class ChatMessagePublisher {
-    postMessage(chatData, flavor, text, inCharacter) {
+    postMessage(chatData, flavor, text, inCharacter, flags = null) {
         const generation = game.data.release.generation;
         const messageStyle = generation < 12
             ? CONST.CHAT_MESSAGE_TYPES.OOC
@@ -12,6 +12,7 @@ export class ChatMessagePublisher {
             speaker: chatData.speaker,
             content: text,
         };
+        if (flags) messageData.flags = flags;
 
         if (generation < 14) {
             messageData.type = messageStyle;

@@ -101,6 +101,13 @@
             "walls": "Limited by Walls",
             "easing": "Adjust Volume",
             "hidden": "Hidden"
+        },
+        "speechStatus": {
+            "preparing": "Preparing speech",
+            "receiving": "Loading audio",
+            "starting": "Starting speech",
+            "failed": "Speech failed",
+            "elapsed": "{seconds}s elapsed"
         }
     }
 }

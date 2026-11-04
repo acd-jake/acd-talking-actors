@@ -225,7 +225,7 @@ export default class TTSConnectorInterface {
      * Implementations should set this._speaking true/false accordingly.
      *
      */
-    async textToSpeech(voiceId, actor, text, settings) {
+    async textToSpeech(voiceId, actor, text, settings, { onProgress } = {}) {
         throw new Error("textToSpeech must be implemented by subclass");
     }
 

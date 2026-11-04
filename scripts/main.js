@@ -6,6 +6,8 @@ import { localize } from "./libs/functions.js";
 import TalkingActorsConstants from "./constants.js";
 import Logger from "./libs/logger.js";
 import { ChatProcessor } from "./chat-processor.js";
+import { SpeechStatus } from "./speech-status.js";
+import { AudioReceiver } from "./libs/audio-transfer.js";
 import { TalkingActorsSettings } from "./module-settings.js";
 import { ReadAloudController } from "./read-aloud-controller.js";
 
@@ -42,9 +44,8 @@ class ACDTalkingActors {
         this.readAloudController = new ReadAloudController(this);
 
         Hooks.once("ready", () => {
-            game.socket.on('module.' + ACDTalkingActors.MODULE_ID, ({ container, historyItemId, text }) => {
-                this.ttsConnector.playSound(container);
-            });
+            const receiver = new AudioReceiver(chunks => this.ttsConnector.playSound(chunks));
+            game.socket.on('module.' + ACDTalkingActors.MODULE_ID, packet => receiver.receive(packet));
 
             this.ready();
         });
@@ -100,7 +101,9 @@ class ACDTalkingActors {
 
         this.ttsConnector.init();
 
-        this.chatProcessor = new ChatProcessor(this.ttsConnector, this.logger);
+        this.speechStatus = new SpeechStatus(this.logger);
+        this.speechStatus.registerHooks();
+        this.chatProcessor = new ChatProcessor(this.ttsConnector, this.logger, { speechStatus: this.speechStatus });
 
         //add generic enrichers to TextEditor
         this.readAloudController.registerTextEditorEnrichers();
