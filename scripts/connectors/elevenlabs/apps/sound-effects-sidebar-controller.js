@@ -10,7 +10,7 @@ export class SoundEffectsSidebarController {
         if (this.isRegistered) return;
 
         Hooks.on("changeSidebarTab", app => {
-            if (!(app instanceof PlaylistDirectory)) return;
+            if (!(app instanceof foundry.applications.sidebar.tabs.PlaylistDirectory)) return;
             if ($("#ta-create-soundeffect").length > 0) return;
 
             this.injectCreateButton();
