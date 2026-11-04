@@ -21,6 +21,7 @@ acd-talking-actors is a FoundryVTT module that brings immersive, AI-powered voic
 - Optional integration with [Yendors Scene Actors](https://foundryvtt.com/packages/yendors-scene-actors) and [Conversation Hud](https://foundryvtt.com/packages/conversation-hud)
 - Read-aloud support for FoundryVTT journals, with macro insertion and flexible voice selection
 - Token HUD button for entering and reading aloud custom text
+- A quiet speech-status line in chat shows preparation stages and elapsed waiting time
 - Option to suppress posting spoken text to chat
 - API for third-party module integration
 - Localized language support (English, German)
