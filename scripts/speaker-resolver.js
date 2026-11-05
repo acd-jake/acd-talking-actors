@@ -27,6 +27,10 @@ export class SpeakerResolver {
         let speakerActor = game.actors.find((a) => a._id == actorId);
 
         if (!speakerActor) {
+            speakerActor = game.scenes.current?.tokens.get(actorId)?.actor;
+        }
+
+        if (!speakerActor) {
             speakerActor = game.actors.find((a) => a.name == actorId);
         }
         return speakerActor;

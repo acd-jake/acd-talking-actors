@@ -31,6 +31,7 @@
             "readAloudWithoutChat": "Vorlesen (Erzähler)\r\nohne Chatnachricht",
             "readAloudCurrentActor": "Vorlesen (Akteur)",
             "readAloudCurrentActorWithoutChat": "Vorlesen (Akteur) ohne Chatnachricht",
+            "readQuotedSpeech": "Wörtliche Rede vorlesen",
             "cancel": "Abbrechen",
             "mute": "Talking Actors stummschalten"
         },

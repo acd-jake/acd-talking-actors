@@ -32,6 +32,7 @@
             "readAloudWithoutChat": "Read Aloud (Narrator) without Chatmessage",
             "readAloudCurrentActor": "Read Aloud (Actor)",
             "readAloudCurrentActorWithoutChat": "Read Aloud (Actor) without Chatmessage",
+            "readQuotedSpeech": "Read quoted speech aloud",
             "cancel": "Cancel",
             "mute": "Mute Talking Actors"
         },

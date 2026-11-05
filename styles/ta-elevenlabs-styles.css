@@ -217,3 +217,14 @@
     font-size: x-large;
     font-weight: bold;
 }
+
+.acd-ta-quote-read-aloud {
+    display: inline;
+    margin-inline-start: 0.25em;
+    padding: 0 0.2em;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    line-height: 1;
+    vertical-align: baseline;
+}

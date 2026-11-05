@@ -3,11 +3,13 @@ import { localize } from "./libs/functions.js";
 import { ReadAloudEnricher } from "./enrichers/read-aloud-enricher.js";
 import { ReadAloudNarratorEnricher } from "./enrichers/read-aloud-narrator-enricher.js";
 import { ReadAloudActorEnricher } from "./enrichers/read-aloud-actor-enricher.js";
+import { QuotedSpeechEnricher } from "./enrichers/quoted-speech-enricher.js";
 
 export class ReadAloudController {
     constructor(module) {
         this.module = module;
         this.contextMenu = null;
+        this.contextMenuText = null;
     }
 
     registerTextEditorEnrichers() {
@@ -15,8 +17,26 @@ export class ReadAloudController {
             CONFIG.TextEditor.enrichers.push(
                 new ReadAloudEnricher(),
                 new ReadAloudActorEnricher(),
-                new ReadAloudNarratorEnricher()
+                new ReadAloudNarratorEnricher(),
+                new QuotedSpeechEnricher()
             );
+
+            document.addEventListener("click", event => {
+                const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+                const button = target?.closest(".acd-ta-quote-read-aloud");
+                if (!button) return;
+
+                event.preventDefault();
+                event.stopPropagation();
+                const controlledTokens = canvas.tokens.controlled;
+                const selectedToken = controlledTokens.length === 1 ? controlledTokens[0] : null;
+                const speakerIdentifier = selectedToken
+                    ? (selectedToken.document.actorLink
+                        ? selectedToken.actor?.id ?? selectedToken.actor?._id
+                        : selectedToken.document.id)
+                    : null;
+                this.module.readAloudCurrentActor(button.dataset.readAloudText, true, speakerIdentifier);
+            });
         } catch (error) {
             this.module.logger.error("Failed to initialize generic enrichers", error);
         }
@@ -27,14 +47,21 @@ export class ReadAloudController {
     }
 
     registerJournalSelectionContextMenu() {
-        if (!game.settings.get(
-            TalkingActorsConstants.MODULE,
-            TalkingActorsConstants.SETTINGS.ENABLE_SELECTION_CONTEXT_MENU,
-        )) return;
-
         document.addEventListener("contextmenu", event => {
             const target = event.target instanceof Element ? event.target : event.target?.parentElement;
-            if (target?.closest(".journal-entry-pages, .editor-content")) {
+            const button = target?.closest(".acd-ta-quote-read-aloud");
+            if (button) {
+                this.contextMenuText = button.dataset.readAloudText;
+                this.showContextMenu(event);
+                return;
+            }
+
+            const selectionMenuEnabled = game.settings.get(
+                TalkingActorsConstants.MODULE,
+                TalkingActorsConstants.SETTINGS.ENABLE_SELECTION_CONTEXT_MENU,
+            );
+            if (selectionMenuEnabled && target?.closest(".journal-entry-pages, .editor-content")) {
+                this.contextMenuText = null;
                 this.showContextMenu(event);
             }
         });
@@ -88,9 +115,10 @@ export class ReadAloudController {
         }).render(true);
     }
 
-    async readAloudCurrentActor(content, postToChat = true) {
+    async readAloudCurrentActor(content, postToChat = true, actorIdentifier = null) {
         const command = this.createChatCommand(postToChat);
-        const message = `/${command} ${content.replace(/\\n/g, "<br>")}`;
+        const speaker = actorIdentifier ? ` {${actorIdentifier}}` : "";
+        const message = `/${command}${speaker} ${content.replace(/\\n/g, "<br>")}`;
         return ui.chat.processMessage(message);
     }
 
@@ -125,6 +153,7 @@ export class ReadAloudController {
     }
 
     async showContextMenu(event) {
+        event.preventDefault();
         const delay = this.contextMenu.isOpen() ? 100 : 0;
         this.contextMenu.hide();
         setTimeout(() => this.contextMenu.show(event.pageX, event.pageY), delay);
@@ -152,7 +181,7 @@ export class ReadAloudController {
             icon: "comment",
             name: game.i18n.localize(labelKey),
             action: () => {
-                const selection = this.getSelectionText();
+                const selection = this.contextMenuText || this.getSelectionText();
                 if (selection) action(selection);
                 this.contextMenu.hide();
             },
