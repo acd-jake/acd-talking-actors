@@ -21,7 +21,8 @@
   "styles": [
     "styles/context-menu.min.css",
     "styles/ta-elevenlabs-styles.css",
-    "styles/speech-status.css"
+    "styles/speech-status.css",
+    "styles/audio-history.css"
   ],
   "esmodules": [
     "scripts/main.js",

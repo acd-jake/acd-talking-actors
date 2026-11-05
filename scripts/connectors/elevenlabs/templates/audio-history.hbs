@@ -1,0 +1,106 @@
+<section class="ta-audio-history">
+    <div class="ta-audio-history__filters">
+        <div class="ta-audio-history__primary-filters">
+            <label class="ta-audio-history__search">
+                <span>{{localize "acd.ta.AudioHistory.search"}}</span>
+                <input type="search" data-history-search value="{{searchFilter}}">
+            </label>
+            <div class="ta-audio-history__type-filters" role="group" aria-label="{{localize 'acd.ta.AudioHistory.type'}}">
+                {{#each typeFilters}}
+                <button type="button" class="ta-audio-history__type-button" data-history-type-filter="{{value}}"
+                    title="{{label}}" aria-label="{{label}}" aria-pressed="{{selected}}">
+                    {{#ifEquals value "all"}}
+                    <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+                    {{else ifEquals value "speech"}}
+                    <i class="fa-solid fa-comment-dots" aria-hidden="true"></i>
+                    {{else}}
+                    <i class="fa-solid fa-wave-square" aria-hidden="true"></i>
+                    {{/ifEquals}}
+                </button>
+                {{/each}}
+            </div>
+        </div>
+        <div class="ta-audio-history__secondary-filters">
+            <label>
+                <span>{{localize "acd.ta.AudioHistory.actor"}}</span>
+                <select data-history-actor>
+                    {{#each actorFilters}}
+                    <option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>
+                    {{/each}}
+                </select>
+            </label>
+            <div class="ta-audio-history__date-range">
+                <label>
+                    <span>{{localize "acd.ta.AudioHistory.dateFrom"}}</span>
+                    <input type="date" data-history-from-date value="{{fromDateFilter}}">
+                </label>
+                <label>
+                    <span>{{localize "acd.ta.AudioHistory.dateTo"}}</span>
+                    <input type="date" data-history-to-date value="{{toDateFilter}}">
+                </label>
+            </div>
+        </div>
+    </div>
+
+    {{#if historyError}}
+    <p class="ta-audio-history__notice">{{historyError}}</p>
+    {{/if}}
+
+    <div class="ta-audio-history__list">
+        {{#each entries}}
+        <article class="ta-audio-history__entry" data-history-entry data-kind="{{kind}}"
+            data-actor-id="{{actorId}}" data-search="{{searchText}}" data-date="{{dateFilterValue}}"
+            data-id="{{id}}" data-src="{{src}}">
+            <div class="ta-audio-history__entry-info">
+                <div class="ta-audio-history__entry-heading">
+                    {{#if direction}}
+                    <span class="ta-audio-history__direction" title="{{localize 'acd.ta.AudioHistory.direction'}}: {{direction}}">
+                        <i class="fa-solid fa-masks-theater" aria-hidden="true"></i>
+                        <span>{{direction}}</span>
+                    </span>
+                    {{/if}}
+                    <h3 data-history-title title="{{title}}">{{title}}</h3>
+                    {{#if description}}
+                    <span class="ta-audio-history__description" title="{{description}}">{{description}}</span>
+                    {{/if}}
+                </div>
+                <div class="ta-audio-history__metadata">
+                    {{#if dateLabel}}<time>{{dateLabel}}</time>{{/if}}
+                    {{#if actorName}}<span>{{localize "acd.ta.AudioHistory.actor"}}: {{actorName}}</span>{{/if}}
+                    {{#if voiceName}}<span>{{localize "acd.ta.AudioHistory.voice"}}: {{voiceName}}</span>{{/if}}
+                    {{#if modelName}}<span>{{localize "acd.ta.AudioHistory.source"}}: {{modelName}}</span>{{/if}}
+                </div>
+            </div>
+            <span class="ta-audio-history__kind ta-audio-history__kind--{{kind}}"
+                title="{{kindLabel}}" aria-label="{{kindLabel}}">
+                {{#ifEquals kind "speech"}}
+                <i class="fa-solid fa-comment-dots" aria-hidden="true"></i>
+                {{else}}
+                <i class="fa-solid fa-wave-square" aria-hidden="true"></i>
+                {{/ifEquals}}
+            </span>
+            <div class="ta-audio-history__actions">
+                <button type="button" data-history-action="play" title="{{localize 'acd.ta.AudioHistory.play'}}"
+                    aria-label="{{localize 'acd.ta.AudioHistory.play'}}">
+                    <i class="fa-solid fa-play" aria-hidden="true"></i>
+                </button>
+                <button type="button" data-history-action="broadcast" title="{{localize 'acd.ta.AudioHistory.broadcast'}}"
+                    aria-label="{{localize 'acd.ta.AudioHistory.broadcast'}}">
+                    <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>
+                </button>
+                <button type="button" data-history-action="download" title="{{localize 'acd.ta.AudioHistory.download'}}"
+                    aria-label="{{localize 'acd.ta.AudioHistory.download'}}">
+                    <i class="fa-solid fa-download" aria-hidden="true"></i>
+                </button>
+            </div>
+        </article>
+        {{/each}}
+        <p class="ta-audio-history__empty" data-history-empty hidden>{{localize "acd.ta.AudioHistory.empty"}}</p>
+    </div>
+
+    {{#if hasMoreHistory}}
+    <button type="button" class="ta-audio-history__load-more" data-history-load-more>
+        {{localize "acd.ta.AudioHistory.loadMore"}}
+    </button>
+    {{/if}}
+</section>

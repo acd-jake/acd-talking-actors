@@ -67,23 +67,33 @@ export class ReadAloudController {
         });
     }
 
-    injectTokenHudButtons(_app, hudHtml, data) {
+    injectTokenHudButtons(app, hudHtml, data) {
         const button = $(
             `<div class="control-icon talkingactors" data-tooltip="${localize("acd.ta.TokenHud.dialog.title")}"><i class="fas fa-comments"></i></div>`,
         );
         const leftColumns = hudHtml.getElementsByClassName?.("col left") ?? [];
+        const controls = leftColumns.length > 0 ? leftColumns[leftColumns.length - 1] : hudHtml.firstChild;
 
-        if (leftColumns.length > 0) {
-            leftColumns[leftColumns.length - 1].append(button[0]);
-        } else if (hudHtml.firstChild) {
-            hudHtml.firstChild.append(button[0]);
-        }
+        controls?.append(button[0]);
 
         button.on("click", async event => {
             event.preventDefault();
             event.stopPropagation();
             await this.showTokenHudReadAloudDialog(data);
         });
+
+        const historyButton = document.createElement("div");
+        historyButton.className = "control-icon talkingactors-history";
+        historyButton.dataset.tooltip = game.i18n.localize("acd.ta.AudioHistory.open");
+        historyButton.innerHTML = '<i class="fa-solid fa-clock-rotate-left"></i>';
+        historyButton.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopPropagation();
+            const token = app?.object;
+            const actorId = token?.actor?.id ?? token?.document?.actor?.id ?? data?.actorId ?? data?.actor?.id;
+            this.module.openAudioHistory({ actorId });
+        });
+        controls?.append(historyButton);
     }
 
     async showTokenHudReadAloudDialog(data) {

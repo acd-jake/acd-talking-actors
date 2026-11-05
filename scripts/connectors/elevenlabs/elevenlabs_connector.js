@@ -6,6 +6,7 @@ import { Mp3Utils } from "../../libs/mp3-utils.js";
 import { sendAudio } from "../../libs/audio-transfer.js";
 import { buildDirectedText, trimDirectionFromChunks } from "../../libs/direction-trimmer.js";
 import { SoundEffectsSidebarController } from "./apps/sound-effects-sidebar-controller.js";
+import { AudioHistoryApp } from "./apps/audio-history-app.js";
 
 export default class ElevenlabsConnector extends TTSConnectorInterface {
 
@@ -15,6 +16,7 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
     contextMenu;
     _speaking = false;
     soundEffectsSidebarController = null;
+    audioHistoryApp = null;
 
     models = [];
 
@@ -171,6 +173,11 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
     async openVoiceSettingsApp(actors) {
         const app = new VoiceSettingsApp(this, actors);
         app.render({ force: true });
+    }
+
+    openAudioHistory(options = {}) {
+        if (!this.audioHistoryApp) this.audioHistoryApp = new AudioHistoryApp(this, options);
+        this.audioHistoryApp.openWith(options);
     }
 
     getAvailableVoices() {
@@ -371,6 +378,15 @@ export default class ElevenlabsConnector extends TTSConnectorInterface {
         } else {
             return foundry.audio.AudioHelper.play({ src: url, volume: 1.0, loop: false }, false);
         }
+    }
+
+    async broadcastAudio(url, text = "") {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Audio fetch failed with status ${response.status}`);
+
+        const chunks = [new Uint8Array(await response.arrayBuffer())];
+        await sendAudio(game.socket, `module.${this.mainModule.id}`, chunks, { text });
+        this.playSound(chunks);
     }
 
     async playSample(voiceId) {

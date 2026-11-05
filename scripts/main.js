@@ -138,22 +138,47 @@ class ACDTalkingActors {
     }
 
     injectControlToolButtons(controls) {
-        if (!controls?.sounds?.tools) {
+        const soundsControl = Array.isArray(controls)
+            ? controls.find(control => control.name === 'sounds')
+            : controls?.sounds;
+        const tools = soundsControl?.tools;
+        if (!tools) {
             this.logger.warn("No sound controls found to inject mute button");
             return;
         }
 
-        controls.sounds.tools['acdTaMute'] = {
+        const audioHistoryTool = {
+            name: 'acdTaAudioHistory',
+            title: game.i18n.localize('acd.ta.AudioHistory.open'),
+            icon: 'fa-solid fa-clock-rotate-left',
+            button: true,
+            visible: true,
+            onChange: (_event, active) => active && this.openAudioHistory(),
+            onClick: () => this.openAudioHistory(),
+        };
+
+        if (Array.isArray(tools)) {
+            if (!tools.some(tool => tool.name === audioHistoryTool.name)) tools.push(audioHistoryTool);
+            return;
+        }
+
+        if (typeof tools !== 'object') return;
+
+        tools['acdTaMute'] = {
             name: "acdTaMute",
             title: game.i18n.localize("acd.ta.controls.mute"),
             icon: "fas fa-comment-slash",
-            order: Object.keys(controls.sounds.tools).length,
+            order: Object.keys(tools).length,
             toggle: true,
             visible: game.user.isGM,
             onChange: (event, active) => {
                 game.acdTalkingActors.ttsConnector.isMuted = active;
             }
-        }
+        };
+        tools[audioHistoryTool.name] = {
+            ...audioHistoryTool,
+            order: Object.keys(tools).length,
+        };
         
     }
 
@@ -175,8 +200,22 @@ class ACDTalkingActors {
             }
         };
 
-        if (!entries.find(e => (e.label ?? e.name) === voiceSettingsContextOption.label)) {
-            entries.push(voiceSettingsContextOption);
+        const audioHistoryContextOption = {
+            label: 'acd.ta.AudioHistory.open',
+            icon: '<i class="fas fa-clock-rotate-left"></i>',
+            visible: () => this.isModuleAccessible(),
+            onClick: (event, target) => {
+                const el = target ?? event?.currentTarget ?? event?.target;
+                const entry = el?.closest?.('[data-entry-id]') ?? el;
+                const actorId = entry?.dataset?.entryId;
+                if (actorId) this.openAudioHistory({ actorId });
+            }
+        };
+
+        for (const option of [voiceSettingsContextOption, audioHistoryContextOption]) {
+            if (!entries.find(entry => (entry.label ?? entry.name) === option.label)) {
+                entries.push(option);
+            }
         }
     }
 
@@ -263,6 +302,10 @@ class ACDTalkingActors {
         if (!actors || actors.length == 0) return;
 
         this.ttsConnector.openVoiceSettingsApp(actors);
+    }
+
+    openAudioHistory(options = {}) {
+        this.ttsConnector.openAudioHistory?.(options);
     }
 
     showTokenHudReadAloudDialog(_event, data) {

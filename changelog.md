@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Journal pages add a read-aloud button after quoted speech.
+- A filterable audio history lists generated speech and sound effects with playback and download actions.
+- Stage directions are identified and displayed alongside their generated speech.
+
+### Changed
+
+- The audio history uses compact two-line entries and icon-based media filters.
 
 ## [1.3.0] - 2026-11-04
 

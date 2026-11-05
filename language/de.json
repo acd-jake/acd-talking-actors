@@ -44,6 +44,36 @@
             "withChat": "Vorlesen",
             "withoutChat": "Vorlesen <b>ohne</b> Chatnachricht"
         },
+        "AudioHistory": {
+            "title": "Audio-Historie",
+            "open": "Audio-Historie öffnen",
+            "search": "Text oder Titel suchen",
+            "type": "Medientyp",
+            "actor": "Akteur",
+            "dateFrom": "Von",
+            "dateTo": "Bis",
+            "voice": "Stimme",
+            "source": "Quelle",
+            "direction": "Regieanweisung",
+            "empty": "Keine passenden Audioeinträge gefunden.",
+            "loadMore": "Weitere Sprachausgaben laden",
+            "loadFailed": "Die Sprachausgaben konnten nicht geladen werden.",
+            "actionFailed": "Die Audioaktion ist fehlgeschlagen.",
+            "noApiKey": "Sprachausgaben sind ohne ElevenLabs-API-Key nicht verfügbar.",
+            "untitled": "Sprachausgabe ohne Text",
+            "filter": {
+                "all": "Alle Medien",
+                "speech": "Sprache",
+                "sound": "Geräusch",
+                "allActors": "Alle Akteure"
+            },
+            "play": "Abspielen",
+            "broadcast": "Auf allen Clients abspielen",
+            "download": "Herunterladen",
+            "dragToScene": "Soundeffekt in die Szene ziehen",
+            "ambientCreated": "Umgebungsgeräusch in der Szene erstellt.",
+            "dropFailed": "Der Soundeffekt konnte nicht in der Szene platziert werden."
+        },
         "errors": {
             "noTokenSelected": "Mindestens ein Token muss ausgewählt sein.",
             "noLinkedActor": "Mindestens ein Token mit einem verbundenen Akteur muss ausgewählt sein.",

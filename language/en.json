@@ -45,6 +45,36 @@
             "withChat": "Read Aloud",
             "withoutChat": "Read Aloud <b>Without</b> Chatmessage"
         },
+        "AudioHistory": {
+            "title": "Audio History",
+            "open": "Open Audio History",
+            "search": "Search text or title",
+            "type": "Media type",
+            "actor": "Actor",
+            "dateFrom": "From",
+            "dateTo": "To",
+            "voice": "Voice",
+            "source": "Source",
+            "direction": "Stage direction",
+            "empty": "No matching audio entries found.",
+            "loadMore": "Load more speech",
+            "loadFailed": "Speech history could not be loaded.",
+            "actionFailed": "The audio action failed.",
+            "noApiKey": "Speech history is unavailable without an ElevenLabs API key.",
+            "untitled": "Speech without text",
+            "filter": {
+                "all": "All media",
+                "speech": "Speech",
+                "sound": "Sound effect",
+                "allActors": "All actors"
+            },
+            "play": "Play",
+            "broadcast": "Play for all clients",
+            "download": "Download",
+            "dragToScene": "Drag sound effect into the scene",
+            "ambientCreated": "Ambient sound created in the scene.",
+            "dropFailed": "The sound effect could not be placed in the scene."
+        },
         "errors": {
             "noTokenSelected": "At least one token has to be selected.",
             "noLinkedActor": "At least one token with a linked actor has to be selected!",
