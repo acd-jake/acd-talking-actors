@@ -52,6 +52,16 @@ export class TalkingActorsSettings {
                 default: "",
             });
 
+            game.settings.register(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.FALLBACK_VOICE, {
+                name: "acd.ta.settings.FallbackVoice",
+                hint: "acd.ta.settings.FallbackVoiceHint",
+                scope: "world",
+                config: true,
+                type: String,
+                default: "",
+                choices: {},
+            });
+
             game.settings.register(TalkingActorsConstants.MODULE, TalkingActorsConstants.SETTINGS.ENABLE_SELECTION_CONTEXT_MENU, {
                 name: "acd.ta.settings.EnableSelectionContextMenu",
                 hint: "acd.ta.settings.EnableSelectionContextMenuHint",
@@ -80,6 +90,30 @@ export class TalkingActorsSettings {
             });
         } catch (error) {
             this.module.logger.error("Settings registration skipped or failed:", error);
+        }
+    }
+
+    async refreshFallbackVoiceChoices() {
+        const voices = this.module.ttsConnector?.getAvailableVoices?.() ?? [];
+        const choices = Object.fromEntries(voices
+            .filter(voice => voice?.id ?? voice?.voice_id)
+            .map(voice => [voice.id ?? voice.voice_id, voice.name ?? voice.id ?? voice.voice_id]));
+        const settingKey = TalkingActorsConstants.SETTINGS.FALLBACK_VOICE;
+        const setting = game.settings.settings.get(`${TalkingActorsConstants.MODULE}.${settingKey}`);
+        const firstVoiceId = Object.keys(choices)[0];
+
+        if (!setting) return;
+
+        setting.choices = choices;
+        setting.default = firstVoiceId ?? "";
+
+        const selectedVoiceId = game.settings.get(TalkingActorsConstants.MODULE, settingKey);
+        if (firstVoiceId && !choices[selectedVoiceId] && game.user?.isGM) {
+            try {
+                await game.settings.set(TalkingActorsConstants.MODULE, settingKey, firstVoiceId);
+            } catch (error) {
+                this.module.logger.warn("Could not set the default fallback voice:", error);
+            }
         }
     }
 }

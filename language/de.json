@@ -3,6 +3,8 @@
         "settings": {
             "NarratorActor": "Erzählender Akteur (ID)",
             "NarratorActorHint": "Der Akteur mit diesem Dokument-Id übernimmt die Rolle des Erzählers. Das bedeutet, dass die Stimmeinstellungen dieses Akteurs benutzt werden, wenn entweder kein Akteur beim /talk Kommando ausgewählt wurde oder keine Stimmeinstellungen für diesen vorgenommen wurden.",
+            "FallbackVoice": "Fallback-Stimme",
+            "FallbackVoiceHint": "Wird verwendet, wenn kein Erzählakteur oder keine verwendbare Akteursstimme konfiguriert ist. Standardmäßig wird die erste verfügbare Stimme verwendet.",
             "AllowUsers": "Benutzer erlaubt",
             "AllowUsersHint": "Ist diese Option aktiv, haben Benutzer, die kein Spielleiter sind, Zugriff auf dieses Modul.",
             "EnableSelectionContextMenu": "Aktiviere Kontextmenü für ausgewählten Text",

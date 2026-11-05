@@ -37,6 +37,7 @@ export default class TalkingActorsConstants {
         AUTO_IN_CHARACTER_TALK: 'autoInCharacterTalk',
         DEBUG: 'debug',
         NARRATORACTOR: 'narrating-actor',
+        FALLBACK_VOICE: 'fallback-voice',
     };
 
     // Hook names that the module will emit/consume

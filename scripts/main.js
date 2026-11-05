@@ -98,8 +98,10 @@ class ACDTalkingActors {
 
         // register any other initialization behavior here
 
-
-        this.ttsConnector.init();
+        this.settingsManager.refreshFallbackVoiceChoices();
+        Promise.resolve(this.ttsConnector.init())
+            .then(() => this.settingsManager.refreshFallbackVoiceChoices())
+            .catch(error => this.logger.error("TTS connector initialization failed:", error));
 
         this.speechStatus = new SpeechStatus(this.logger);
         this.speechStatus.registerHooks();

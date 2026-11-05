@@ -45,6 +45,17 @@ export class ChatVoiceResolver {
             this.updateChatSpeaker(chatData, speakerActor);
         }
 
+        if (!voiceId) {
+            const availableVoices = this.ttsConnector.getAvailableVoices();
+            const configuredVoiceId = game.settings.get(
+                TalkingActorsConstants.MODULE,
+                TalkingActorsConstants.SETTINGS.FALLBACK_VOICE,
+            );
+            const configuredVoice = availableVoices.find(voice => (voice.id ?? voice.voice_id) === configuredVoiceId);
+            const fallbackVoice = configuredVoice ?? availableVoices[0];
+            voiceId = fallbackVoice?.id ?? fallbackVoice?.voice_id ?? null;
+        }
+
         return { voiceId, settings, speakerActor, inCharacter };
     }
 
